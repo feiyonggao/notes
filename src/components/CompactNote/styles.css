@@ -1,0 +1,293 @@
+/* 精简便签样式 */
+.compact-note {
+  position: fixed;
+  top: 100px;
+  left: 100px;
+  width: 220px;
+  min-height: 120px;
+  max-height: 300px;
+  background: #FFF9C4;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+  overflow: hidden;
+}
+
+/* 标题栏 */
+.compact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-color {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.btn-color:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  display: block;
+}
+
+.color-picker-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.color-picker-popup .color-option {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.color-picker-popup .color-option:hover {
+  transform: scale(1.1);
+}
+
+.color-picker-popup .color-option.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.save-indicator {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.btn-menu,
+.btn-close {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: 4px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  padding: 0;
+  cursor: pointer;
+}
+
+.btn-menu:hover,
+.btn-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/* 菜单 */
+.compact-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 150px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.compact-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+}
+
+.compact-menu button:hover {
+  background: var(--bg-hover);
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
+.opacity-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.opacity-control input[type="range"] {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  outline: none;
+}
+
+.opacity-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* 内容区域 */
+.compact-content-area {
+  flex: 1;
+  padding: 8px 12px;
+  cursor: text;
+  min-height: 60px;
+  overflow: hidden;
+}
+
+/* 显示模式 */
+.compact-title-display {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compact-content-display {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 编辑模式 */
+.compact-note.editing {
+  min-height: 150px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.compact-note.editing .compact-content-area {
+  cursor: text;
+}
+
+/* 标题 */
+.compact-title {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+  line-height: 1.4;
+  resize: none;
+  overflow: hidden;
+  min-height: 24px;
+  padding: 0;
+  margin-bottom: 4px;
+  outline: none;
+  display: block;
+}
+
+.compact-title::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.compact-title:focus {
+  box-shadow: none;
+}
+
+/* 内容 */
+.compact-content {
+  flex: 1;
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.75);
+  line-height: 1.5;
+  resize: none;
+  overflow: hidden;
+  min-height: 50px;
+  padding: 0;
+  outline: none;
+  font-family: inherit;
+  display: block;
+}
+
+.compact-content::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.compact-content:focus {
+  box-shadow: none;
+}
+
+/* 拖拽状态 */
+.compact-note.dragging {
+  opacity: 0.8;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transition: none;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

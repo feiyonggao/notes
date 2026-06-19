@@ -1,0 +1,201 @@
+/* 桌面模式编辑器 */
+.desktop-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* 工具栏 */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 颜色选择器 */
+.color-picker-wrapper {
+  position: relative;
+}
+
+.btn-color {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-color:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.color-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  display: block;
+}
+
+.color-picker-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.color-picker-popup .color-option {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.color-picker-popup .color-option:hover {
+  transform: scale(1.1);
+}
+
+.color-picker-popup .color-option.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+/* 保存状态 */
+.save-status {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.save-status .saving {
+  color: var(--primary);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.save-status .unsaved {
+  color: #f59e0b;
+}
+
+.save-status .saved {
+  color: #10b981;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* 操作按钮 */
+.btn-action {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.btn-action:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.btn-action.active {
+  background: rgba(99, 102, 241, 0.2);
+}
+
+.btn-action.delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* 标题输入 */
+.editor-title {
+  width: 100%;
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.85);
+  outline: none;
+  margin-bottom: 8px;
+}
+
+.editor-title::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* 内容输入 */
+.editor-content-wrapper {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  min-height: 100px;
+}
+
+/* 底部信息 */
+.editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
+}
+
+.footer-time {
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.footer-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tag-chip {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  color: rgba(0, 0, 0, 0.6);
+}

@@ -1,0 +1,357 @@
+/* 便签编辑器样式 */
+.note-editor {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow-y: auto;
+  transition: background-color var(--transition-normal);
+  position: relative;
+  min-height: 500px;
+}
+
+/* 上传遮罩 */
+.upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.upload-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.upload-overlay span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* 空状态 */
+.editor-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+}
+
+.empty-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-content h3 {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.empty-content p {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+}
+
+/* 顶部工具栏 */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* 颜色选择器 */
+.color-picker-wrapper {
+  position: relative;
+}
+
+.btn-color {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: var(--radius-md);
+  padding: 0;
+}
+
+.btn-color:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.color-preview {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  display: block;
+}
+
+.color-picker {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.375rem;
+  padding: 0.625rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+}
+
+.color-option {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  transition: all var(--transition-fast);
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+}
+
+.color-option.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+/* Markdown 按钮 */
+.btn-markdown {
+  padding: 0.25rem 0.625rem;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-sm);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
+}
+
+.btn-markdown:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.btn-markdown.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* 保存状态 */
+.save-status {
+  font-size: 0.6875rem;
+  color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.save-status .saving {
+  color: var(--primary);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.save-status .unsaved {
+  color: #f59e0b;
+}
+
+.save-status .saved {
+  color: #10b981;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* 删除确认 */
+.delete-wrapper {
+  position: relative;
+}
+
+.delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.625rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-size: 0.75rem;
+}
+
+.btn-confirm-yes,
+.btn-confirm-no {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.btn-confirm-yes {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-confirm-yes:hover {
+  background: #dc2626;
+}
+
+.btn-confirm-no {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.btn-confirm-no:hover {
+  background: var(--bg-hover);
+}
+
+/* 删除按钮 */
+.btn-delete,
+.btn-close {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  padding: 0;
+  opacity: 0.6;
+  transition: all var(--transition-fast);
+}
+
+.btn-delete:hover,
+.btn-close:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.btn-close {
+  font-size: 1rem;
+}
+
+/* 标题输入 */
+.editor-title {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.85);
+  line-height: 1.4;
+  resize: none;
+  overflow: hidden;
+  min-height: 2.5rem;
+  padding: 0;
+  margin-bottom: 0.75rem;
+}
+
+.editor-title::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.editor-title:focus {
+  box-shadow: none;
+}
+
+/* 内容输入 - 使用富文本编辑器 */
+.note-editor .rich-editor-container {
+  flex: 1;
+  min-height: 200px;
+}
+
+/* 标签区域 */
+.editor-tags {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* 底部信息 */
+.editor-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.footer-time {
+  font-size: 0.6875rem;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.footer-shortcut {
+  margin-left: auto;
+  font-size: 0.6875rem;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .note-editor {
+    padding: 0.75rem;
+  }
+
+  .editor-title {
+    font-size: 1.25rem;
+  }
+
+  .editor-content {
+    font-size: 0.875rem;
+  }
+
+  .editor-footer {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .footer-shortcut {
+    width: 100%;
+    margin-left: 0;
+  }
+}

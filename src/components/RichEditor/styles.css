@@ -1,0 +1,836 @@
+/* 富文本编辑器样式 */
+.rich-editor-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 格式化工具栏 */
+.format-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: none;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.15);
+  margin: 0 4px;
+}
+
+.format-btn {
+  width: 32px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.7);
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.format-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.format-btn:active {
+  background: rgba(0, 0, 0, 0.12);
+  transform: scale(0.95);
+}
+
+.format-btn strong {
+  font-weight: 700;
+}
+
+.format-btn em {
+  font-style: italic;
+}
+
+.format-btn u {
+  text-decoration: underline;
+}
+
+.format-btn s {
+  text-decoration: line-through;
+}
+
+/* 上传进度 */
+.upload-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 0.2s ease-out;
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* 编辑器 */
+.rich-editor {
+  flex: 1;
+  min-height: 200px;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  outline: none;
+  overflow-y: auto;
+  line-height: 1.7;
+  font-size: 0.9375rem;
+  color: rgba(0, 0, 0, 0.75);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.rich-editor:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+/* 占位符 */
+.rich-editor:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+/* 内联图片 */
+.rich-editor .inline-image {
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 4px 0;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.rich-editor .inline-image:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.02);
+}
+
+.rich-editor .inline-image:hover::after {
+  content: '双击查看大图';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 12px;
+  padding: 6px;
+  text-align: center;
+  border-radius: 0 0 4px 4px;
+}
+
+/* 图片选中状态 */
+.rich-editor .inline-image::selection {
+  background: var(--primary-light);
+}
+
+/* 图片预览模态框 */
+.image-preview-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  cursor: pointer;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.preview-image {
+  max-width: 90%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.btn-close-preview {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-close-preview:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* 滚动条 */
+.rich-editor::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rich-editor::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rich-editor::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.rich-editor::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .rich-editor {
+    min-height: 150px;
+    font-size: 0.875rem;
+  }
+}
+
+/* Markdown 预览 */
+.markdown-preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  overflow: hidden;
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.preview-header .btn-close-preview {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+  transition: all 0.15s ease;
+}
+
+.preview-header .btn-close-preview:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.preview-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  line-height: 1.7;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+/* Markdown 渲染样式 */
+.preview-content h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.preview-content h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.4rem;
+}
+
+.preview-content h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.3rem;
+}
+
+.preview-content h4,
+.preview-content h5,
+.preview-content h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.3rem;
+}
+
+.preview-content p {
+  margin: 0.5rem 0;
+}
+
+.preview-content ul,
+.preview-content ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.preview-content li {
+  margin: 0.25rem 0;
+}
+
+.preview-content blockquote {
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  border-left: 3px solid var(--primary);
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.preview-content code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.preview-content pre {
+  margin: 0.5rem 0;
+  padding: 1rem;
+  background: #1e1e1e;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.preview-content pre code {
+  background: transparent;
+  padding: 0;
+  color: #d4d4d4;
+}
+
+.preview-content a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.preview-content a:hover {
+  text-decoration: underline;
+}
+
+.preview-content hr {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  margin: 1rem 0;
+}
+
+.preview-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+}
+
+.preview-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.preview-content th,
+.preview-content td {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.preview-content th {
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
+
+/* 预览按钮激活状态 */
+.format-btn.preview-btn.active {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Markdown 编辑器包装器 */
+.markdown-editor-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  overflow: hidden;
+  min-height: 500px;
+  height: calc(100vh - 200px);
+}
+
+/* Markdown 分栏视图 */
+.markdown-split-view {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.markdown-edit-pane,
+.markdown-preview-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.markdown-edit-pane {
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.pane-header {
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.markdown-preview-pane .preview-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background: white;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+/* Markdown 文本编辑区 */
+.markdown-textarea {
+  flex: 1;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.85);
+  tab-size: 4;
+  min-height: 300px;
+}
+
+.markdown-textarea:focus {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.markdown-textarea::placeholder {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.markdown-textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.markdown-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.markdown-textarea::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.markdown-textarea::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Markdown 工具栏 */
+.markdown-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+}
+
+.toolbar-btn {
+  width: 32px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.7);
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.toolbar-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.toolbar-btn:active {
+  background: rgba(0, 0, 0, 0.12);
+  transform: scale(0.95);
+}
+
+.toolbar-btn.add-btn {
+  width: 36px;
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.toolbar-btn.add-btn:hover {
+  background: var(--primary-hover);
+}
+
+.add-icon {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.15);
+  margin: 0 4px;
+}
+
+/* 格式菜单遮罩层 */
+.format-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 100px;
+}
+
+/* 格式菜单 */
+.format-menu {
+  position: absolute;
+  width: 320px;
+  max-height: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.format-menu-header {
+  padding: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.format-search {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.format-search:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.format-search::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.format-menu-content {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.format-category {
+  padding: 4px 0;
+}
+
+.format-category-title {
+  padding: 8px 16px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.format-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.format-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.format-item:active {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.format-item-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.7);
+  flex-shrink: 0;
+}
+
+.format-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.format-item-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.format-item-description {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.format-no-results {
+  padding: 20px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 14px;
+}
+
+/* 滚动条 */
+.format-menu-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.format-menu-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.format-menu-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.format-menu-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.md-editor-wrapper .w-md-editor {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.md-editor-wrapper .w-md-editor-toolbar {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.md-editor-wrapper .w-md-editor-content {
+  background: white !important;
+}
+
+.md-editor-wrapper .w-md-editor-text-pre,
+.md-editor-wrapper .w-md-editor-text-input,
+.md-editor-wrapper .w-md-editor-text {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+.md-editor-wrapper .wmde-markdown {
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+}
+
+.md-editor-wrapper .wmde-markdown h1 {
+  font-size: 1.5rem !important;
+  margin: 0.5rem 0 !important;
+}
+
+.md-editor-wrapper .wmde-markdown h2 {
+  font-size: 1.25rem !important;
+  margin: 0.4rem 0 !important;
+}
+
+.md-editor-wrapper .wmde-markdown h3 {
+  font-size: 1.1rem !important;
+  margin: 0.3rem 0 !important;
+}
+
+.md-editor-wrapper .wmde-markdown p {
+  margin: 0.3rem 0 !important;
+}
+
+.md-editor-wrapper .wmde-markdown ul,
+.md-editor-wrapper .wmde-markdown ol {
+  margin: 0.3rem 0 !important;
+  padding-left: 1.5rem !important;
+}
+
+.md-editor-wrapper .wmde-markdown blockquote {
+  margin: 0.3rem 0 !important;
+  padding: 0.3rem 1rem !important;
+  border-left: 3px solid var(--primary) !important;
+}
+
+.md-editor-wrapper .wmde-markdown code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  background: rgba(0, 0, 0, 0.06) !important;
+  padding: 2px 4px !important;
+  border-radius: 3px !important;
+}
+
+.md-editor-wrapper .wmde-markdown pre {
+  margin: 0.5rem 0 !important;
+  padding: 0.75rem !important;
+  background: #1e1e1e !important;
+  border-radius: 6px !important;
+}
+
+.md-editor-wrapper .wmde-markdown pre code {
+  background: transparent !important;
+  color: #d4d4d4 !important;
+}
+
+.md-editor-wrapper .wmde-markdown hr {
+  border: none !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.15) !important;
+  margin: 0.75rem 0 !important;
+}
+
+.md-editor-wrapper .wmde-markdown a {
+  color: var(--primary) !important;
+  text-decoration: none !important;
+}
+
+.md-editor-wrapper .wmde-markdown a:hover {
+  text-decoration: underline !important;
+}
+
+.md-editor-wrapper .wmde-markdown img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 4px !important;
+}
+
+.md-editor-wrapper .wmde-markdown table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin: 0.5rem 0 !important;
+}
+
+.md-editor-wrapper .wmde-markdown th,
+.md-editor-wrapper .wmde-markdown td {
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  padding: 6px 10px !important;
+}
+
+.md-editor-wrapper .wmde-markdown th {
+  background: rgba(0, 0, 0, 0.05) !important;
+  font-weight: 600 !important;
+}

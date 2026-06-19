@@ -1,0 +1,135 @@
+/* 浮动触点样式 */
+.floating-dock {
+  position: fixed;
+  z-index: 9999;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.floating-dock.dragging {
+  cursor: grabbing;
+  transform: scale(1.1);
+}
+
+.floating-dock:hover {
+  transform: scale(1.05);
+}
+
+/* 主按钮 */
+.dock-main {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.3);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.floating-dock:hover .dock-main {
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  transform: scale(1.05);
+}
+
+.floating-dock.open .dock-main {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  transform: rotate(45deg);
+}
+
+.dock-icon {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.floating-dock.open .dock-icon {
+  transform: rotate(-45deg);
+}
+
+.dock-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 9999px;
+  min-width: 16px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* 便签预览 */
+.dock-preview {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.preview-item {
+  width: 120px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+  animation: fadeInScale 0.3s ease-out backwards;
+  border: 1px solid transparent;
+}
+
+.preview-item:hover {
+  transform: translateX(-6px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: var(--primary);
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+.preview-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.8);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 脉冲动画 - 已禁用以减少干扰 */
+
+/* 吸附边缘效果 */
+.floating-dock {
+  transition: left 0.3s ease, top 0.3s ease;
+}
+
+.floating-dock.dragging {
+  transition: none;
+}
