@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>生成 ICO 文件</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .preview {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .preview-item {
+            text-align: center;
+        }
+        .preview-item canvas {
+            display: block;
+            margin: 0 auto 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .preview-item span {
+            font-size: 12px;
+            color: #666;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 8px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+        }
+        .instructions ol {
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        code {
+            background: #e8e8e8;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Notes 应用 ICO 图标生成器</h1>
+        <p>生成 Windows 可执行文件使用的 ICO 图标文件</p>
+
+        <h2>图标预览</h2>
+        <div class="preview" id="preview"></div>
+
+        <div>
+            <button onclick="generateICO()">📥 生成并下载 ICO 文件</button>
+            <button onclick="generateAllPNG()">📦 下载所有 PNG 文件</button>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 使用说明</h3>
+            <ol>
+                <li>点击"📥 生成并下载 ICO 文件"按钮</li>
+                <li>将下载的 <code>icon.ico</code> 文件复制到 <code>src-tauri/icons/</code> 目录</li>
+                <li>替换原有的 <code>icon.ico</code> 文件</li>
+                <li>清理编译缓存：<code>cd src-tauri && cargo clean</code></li>
+                <li>重新编译：<code>npm run tauri build</code></li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // 毛玻璃效果图标 SVG
+        const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <defs>
+                <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+                    <feDropShadow dx="3" dy="3" stdDeviation="8" flood-color="#00000040"/>
+                </filter>
+            </defs>
+            <rect x="20" y="20" width="472" height="472" rx="80" ry="80" fill="#F5F5F5"/>
+            <rect x="40" y="40" width="432" height="432" rx="65" ry="65" fill="rgba(255,255,255,0.85)" stroke="#E0E0E0" stroke-width="2"/>
+            <circle cx="400" cy="120" r="80" fill="rgba(255,255,255,0.4)"/>
+            <circle cx="120" cy="400" r="60" fill="rgba(255,255,255,0.3)"/>
+            <text x="256" y="240" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="180" font-weight="bold" fill="#424242" filter="url(#shadow)">N</text>
+            <text x="256" y="310" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="48" fill="#757575" letter-spacing="8">Notes</text>
+            <rect x="150" y="340" width="212" height="4" rx="2" fill="#E0E0E0"/>
+            <rect x="170" y="360" width="172" height="3" rx="1.5" fill="#EEEEEE"/>
+            <rect x="190" y="375" width="132" height="3" rx="1.5" fill="#EEEEEE"/>
+            <circle cx="400" cy="112" r="45" fill="#4CAF50" filter="url(#shadow)"/>
+            <path d="M 378 112 L 392 126 L 422 96" fill="none" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="120" cy="400" r="25" fill="rgba(76, 175, 80, 0.2)"/>
+            <circle cx="120" cy="400" r="12" fill="rgba(76, 175, 80, 0.3)"/>
+        </svg>`;
+
+        // ICO 文件需要的尺寸
+        const icoSizes = [16, 24, 32, 48, 64, 128, 256];
+
+        window.onload = function() {
+            const previewDiv = document.getElementById('preview');
+            icoSizes.forEach(size => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+
+                const img = new Image();
+                const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(svgBlob);
+
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0, size, size);
+                    URL.revokeObjectURL(url);
+                };
+                img.src = url;
+
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.appendChild(canvas);
+                const span = document.createElement('span');
+                span.textContent = `${size}x${size}`;
+                div.appendChild(span);
+                previewDiv.appendChild(div);
+            });
+        };
+
+        // 生成 ICO 文件
+        function generateICO() {
+            // ICO 文件格式比较复杂，这里使用简化的方法
+            // 实际上需要使用专门的库或工具来生成正确的 ICO 文件
+
+            // 生成 256x256 的 PNG 作为主要图标
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+
+            const img = new Image();
+            const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, 256, 256);
+                URL.revokeObjectURL(url);
+
+                // 下载为 PNG，用户需要手动转换为 ICO
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'icon-256x256.png';
+                link.click();
+
+                alert('✅ 已下载 256x256 PNG 文件！\n\n' +
+                    '下一步：\n' +
+                    '1. 访问 https://convertico.com/\n' +
+                    '2. 上传下载的 PNG 文件\n' +
+                    '3. 下载生成的 ICO 文件\n' +
+                    '4. 替换 src-tauri/icons/icon.ico\n' +
+                    '5. 运行 cargo clean && npm run tauri build');
+            };
+            img.src = url;
+        }
+
+        // 生成所有 PNG 文件
+        function generateAllPNG() {
+            const sizes = [16, 24, 32, 48, 64, 128, 256, 512];
+            let count = 0;
+
+            sizes.forEach(size => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+
+                const img = new Image();
+                const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(svgBlob);
+
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0, size, size);
+                    URL.revokeObjectURL(url);
+
+                    setTimeout(() => {
+                        const link = document.createElement('a');
+                        link.href = canvas.toDataURL('image/png');
+                        link.download = `icon-${size}x${size}.png`;
+                        link.click();
+                        count++;
+
+                        if (count === sizes.length) {
+                            alert('✅ 所有 PNG 文件已下载！\n\n' +
+                                '下一步：\n' +
+                                '1. 使用 https://convertico.com/ 将 256x256 PNG 转换为 ICO\n' +
+                                '2. 替换 src-tauri/icons/ 中的所有文件\n' +
+                                '3. 运行 cargo clean && npm run tauri build');
+                        }
+                    }, count * 200);
+                };
+                img.src = url;
+            });
+        }
+    </script>
+</body>
+</html>

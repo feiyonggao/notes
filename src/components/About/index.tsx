@@ -1,5 +1,6 @@
 import React from 'react';
 import Modal from '../Modal';
+import { openUrl } from '@tauri-apps/plugin-opener';
 import './styles.css';
 
 interface AboutProps {
@@ -14,7 +15,7 @@ const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
         {/* Logo */}
         <div className="about-logo">
           <span className="logo-icon">📝</span>
-          <h2 className="logo-title">Rusty Notes</h2>
+          <h2 className="logo-title">Notes</h2>
           <p className="logo-version">版本 1.0.0</p>
         </div>
 
@@ -74,9 +75,9 @@ const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
 
         {/* 版权信息 */}
         <div className="about-footer">
-          <p>© 2026 Rusty Notes. 用 ❤️ 和 Rust 构建</p>
+          <p>© 2026 Notes. 用 ❤️ 和 Rust 构建</p>
           <p className="about-link">
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+            <a href="#" onClick={(e) => { e.preventDefault(); openUrl('https://github.com/feiyonggao/notes'); }}>
               GitHub
             </a>
             {' · '}

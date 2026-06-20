@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notes 图标选择器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+        .icon-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .icon-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        .icon-card.selected {
+            border: 3px solid #4CAF50;
+        }
+        .icon-card.selected::after {
+            content: '✓ 已选择';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .icon-preview {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .icon-preview svg {
+            width: 100%;
+            height: 100%;
+        }
+        .icon-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .icon-desc {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+        .icon-colors {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .actions {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .icons-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Notes 图标选择器</h1>
+        <p class="subtitle">选择一个你喜欢的图标风格，点击选中后下载</p>
+
+        <div class="icons-grid">
+            <!-- 图标 1: 经典便签 -->
+            <div class="icon-card" onclick="selectIcon(this, 1)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 140">
+                        <rect x="0" y="0" width="120" height="140" rx="8" ry="8" fill="#FFE082"/>
+                        <path d="M 90 0 L 120 30 L 90 30 Z" fill="#FFC107"/>
+                        <line x1="20" y1="40" x2="100" y2="40" stroke="#E6C860" stroke-width="2"/>
+                        <line x1="20" y1="55" x2="100" y2="55" stroke="#E6C860" stroke-width="2"/>
+                        <line x1="20" y1="70" x2="100" y2="70" stroke="#E6C860" stroke-width="2"/>
+                        <line x1="20" y1="85" x2="80" y2="85" stroke="#E6C860" stroke-width="2"/>
+                        <circle cx="60" cy="-10" r="15" fill="#F44336" stroke="#D32F2F" stroke-width="2"/>
+                        <circle cx="60" cy="-10" r="6" fill="#FFCDD2"/>
+                    </svg>
+                </div>
+                <div class="icon-name">经典便签</div>
+                <div class="icon-desc">传统便签样式，带图钉和横线</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #FFE082"></span>
+                    <span class="color-dot" style="background: #F44336"></span>
+                    <span class="color-dot" style="background: #FFC107"></span>
+                </div>
+            </div>
+
+            <!-- 图标 2: 现代简约 -->
+            <div class="icon-card" onclick="selectIcon(this, 2)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 140">
+                        <rect x="0" y="0" width="120" height="140" rx="12" ry="12" fill="#81D4FA"/>
+                        <path d="M 80 0 C 80 0 120 0 120 40 L 80 40 Z" fill="#29B6F6"/>
+                        <text x="60" y="65" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold" fill="white">N</text>
+                        <rect x="25" y="80" width="70" height="4" rx="2" fill="rgba(255,255,255,0.6)"/>
+                        <rect x="25" y="92" width="50" height="4" rx="2" fill="rgba(255,255,255,0.6)"/>
+                        <rect x="25" y="104" width="60" height="4" rx="2" fill="rgba(255,255,255,0.6)"/>
+                    </svg>
+                </div>
+                <div class="icon-name">现代简约</div>
+                <div class="icon-desc">简约设计，突出字母 N</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #81D4FA"></span>
+                    <span class="color-dot" style="background: #29B6F6"></span>
+                </div>
+            </div>
+
+            <!-- 图标 3: 3D 立体 -->
+            <div class="icon-card" onclick="selectIcon(this, 3)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 130 150">
+                        <path d="M 10 20 L 120 20 L 120 150 L 10 150 Z" fill="#E0E0E0"/>
+                        <rect x="0" y="0" width="110" height="130" rx="6" ry="6" fill="#A5D6A7"/>
+                        <path d="M 75 0 L 110 35 L 75 35 Z" fill="#43A047"/>
+                        <circle cx="55" cy="50" r="20" fill="white" opacity="0.3"/>
+                        <text x="55" y="57" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="white">✓</text>
+                        <line x1="25" y1="90" x2="85" y2="90" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+                        <line x1="25" y1="102" x2="70" y2="102" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="icon-name">3D 立体</div>
+                <div class="icon-desc">立体效果，带阴影和对勾</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #A5D6A7"></span>
+                    <span class="color-dot" style="background: #43A047"></span>
+                </div>
+            </div>
+
+            <!-- 图标 4: 渐变彩色 -->
+            <div class="icon-card" onclick="selectIcon(this, 4)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 140">
+                        <defs>
+                            <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#F48FB1"/>
+                                <stop offset="100%" style="stop-color:#EC407A"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="0" width="120" height="140" rx="10" ry="10" fill="url(#grad4)"/>
+                        <rect x="15" y="20" width="90" height="3" rx="1.5" fill="rgba(255,255,255,0.7)"/>
+                        <rect x="15" y="32" width="75" height="3" rx="1.5" fill="rgba(255,255,255,0.7)"/>
+                        <rect x="15" y="44" width="85" height="3" rx="1.5" fill="rgba(255,255,255,0.7)"/>
+                        <circle cx="90" cy="100" r="25" fill="white" opacity="0.3"/>
+                        <text x="90" y="107" text-anchor="middle" font-family="Arial" font-size="24" fill="white">+</text>
+                    </svg>
+                </div>
+                <div class="icon-name">渐变彩色</div>
+                <div class="icon-desc">粉色渐变，带加号按钮</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #F48FB1"></span>
+                    <span class="color-dot" style="background: #EC407A"></span>
+                </div>
+            </div>
+
+            <!-- 图标 5: 紫色优雅 -->
+            <div class="icon-card" onclick="selectIcon(this, 5)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 140">
+                        <defs>
+                            <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#CE93D8"/>
+                                <stop offset="100%" style="stop-color:#AB47BC"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="0" width="120" height="140" rx="15" ry="15" fill="url(#grad5)"/>
+                        <path d="M 20 30 Q 60 10 100 30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M 20 50 Q 60 30 100 50" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="60" cy="90" r="20" fill="white" opacity="0.3"/>
+                        <path d="M 50 90 L 55 95 L 70 80" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="icon-name">紫色优雅</div>
+                <div class="icon-desc">优雅紫色，带波浪线和对勾</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #CE93D8"></span>
+                    <span class="color-dot" style="background: #AB47BC"></span>
+                </div>
+            </div>
+
+            <!-- 图标 6: 橙色活力 -->
+            <div class="icon-card" onclick="selectIcon(this, 6)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 140">
+                        <defs>
+                            <linearGradient id="grad6" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FFAB91"/>
+                                <stop offset="100%" style="stop-color:#FF7043"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="0" width="120" height="140" rx="8" ry="8" fill="url(#grad6)"/>
+                        <path d="M 85 0 L 120 35 L 85 35 Z" fill="#E64A19"/>
+                        <rect x="20" y="50" width="80" height="8" rx="4" fill="white" opacity="0.5"/>
+                        <rect x="20" y="65" width="60" height="8" rx="4" fill="white" opacity="0.5"/>
+                        <rect x="20" y="80" width="70" height="8" rx="4" fill="white" opacity="0.5"/>
+                        <rect x="20" y="95" width="50" height="8" rx="4" fill="white" opacity="0.5"/>
+                        <circle cx="95" cy="110" r="18" fill="#FF5722" stroke="white" stroke-width="2"/>
+                        <text x="95" y="116" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="white">✎</text>
+                    </svg>
+                </div>
+                <div class="icon-name">橙色活力</div>
+                <div class="icon-desc">活力橙色，带编辑图标</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #FFAB91"></span>
+                    <span class="color-dot" style="background: #FF7043"></span>
+                </div>
+            </div>
+
+            <!-- 图标 7: 扁平化设计 -->
+            <div class="icon-card" onclick="selectIcon(this, 7)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 120">
+                        <rect x="0" y="0" width="120" height="120" rx="4" ry="4" fill="#2196F3"/>
+                        <rect x="5" y="5" width="110" height="110" rx="2" ry="2" fill="#E3F2FD"/>
+                        <rect x="15" y="20" width="60" height="4" rx="2" fill="#1976D2"/>
+                        <rect x="15" y="30" width="80" height="4" rx="2" fill="#64B5F6"/>
+                        <rect x="15" y="40" width="70" height="4" rx="2" fill="#64B5F6"/>
+                        <rect x="15" y="50" width="50" height="4" rx="2" fill="#64B5F6"/>
+                        <circle cx="90" cy="85" r="15" fill="#FF9800" stroke="white" stroke-width="2"/>
+                        <text x="90" y="91" text-anchor="middle" font-family="Arial" font-size="16" fill="white">+</text>
+                    </svg>
+                </div>
+                <div class="icon-name">扁平化设计</div>
+                <div class="icon-desc">Material Design 风格</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #2196F3"></span>
+                    <span class="color-dot" style="background: #FF9800"></span>
+                </div>
+            </div>
+
+            <!-- 图标 8: 毛玻璃效果 -->
+            <div class="icon-card" onclick="selectIcon(this, 8)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 120">
+                        <rect x="0" y="0" width="120" height="120" rx="20" ry="20" fill="#F5F5F5"/>
+                        <rect x="10" y="10" width="100" height="100" rx="15" ry="15" fill="rgba(255,255,255,0.8)" stroke="#E0E0E0" stroke-width="1"/>
+                        <text x="60" y="55" text-anchor="middle" font-family="Arial" font-size="36" font-weight="bold" fill="#424242">N</text>
+                        <text x="60" y="75" text-anchor="middle" font-family="Arial" font-size="12" fill="#757575">Notes</text>
+                        <circle cx="95" cy="25" r="10" fill="#4CAF50"/>
+                        <text x="95" y="29" text-anchor="middle" font-family="Arial" font-size="12" fill="white">✓</text>
+                    </svg>
+                </div>
+                <div class="icon-name">毛玻璃效果</div>
+                <div class="icon-desc">现代毛玻璃风格，简洁大方</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #F5F5F5"></span>
+                    <span class="color-dot" style="background: #4CAF50"></span>
+                </div>
+            </div>
+
+            <!-- 图标 9: 渐变现代化 -->
+            <div class="icon-card" onclick="selectIcon(this, 9)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 120">
+                        <defs>
+                            <linearGradient id="grad9" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea"/>
+                                <stop offset="100%" style="stop-color:#764ba2"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="0" width="120" height="120" rx="25" ry="25" fill="url(#grad9)"/>
+                        <rect x="20" y="30" width="80" height="5" rx="2.5" fill="rgba(255,255,255,0.8)"/>
+                        <rect x="20" y="42" width="65" height="5" rx="2.5" fill="rgba(255,255,255,0.6)"/>
+                        <rect x="20" y="54" width="75" height="5" rx="2.5" fill="rgba(255,255,255,0.6)"/>
+                        <rect x="20" y="66" width="55" height="5" rx="2.5" fill="rgba(255,255,255,0.6)"/>
+                        <circle cx="85" cy="90" r="18" fill="rgba(255,255,255,0.3)"/>
+                        <text x="85" y="96" text-anchor="middle" font-family="Arial" font-size="20" fill="white">✏</text>
+                    </svg>
+                </div>
+                <div class="icon-name">渐变现代化</div>
+                <div class="icon-desc">紫色渐变，现代感十足</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #667eea"></span>
+                    <span class="color-dot" style="background: #764ba2"></span>
+                </div>
+            </div>
+
+            <!-- 图标 10: 简约方形 -->
+            <div class="icon-card" onclick="selectIcon(this, 10)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 120">
+                        <rect x="0" y="0" width="120" height="120" rx="8" ry="8" fill="white" stroke="#E0E0E0" stroke-width="2"/>
+                        <rect x="0" y="0" width="120" height="35" rx="8" ry="8" fill="#FFC107"/>
+                        <rect x="0" y="27" width="120" height="8" fill="#FFC107"/>
+                        <text x="60" y="26" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="white">📝 Notes</text>
+                        <rect x="15" y="50" width="90" height="3" rx="1.5" fill="#FFD54F"/>
+                        <rect x="15" y="60" width="75" height="3" rx="1.5" fill="#FFD54F"/>
+                        <rect x="15" y="70" width="85" height="3" rx="1.5" fill="#FFD54F"/>
+                        <rect x="15" y="80" width="60" height="3" rx="1.5" fill="#FFD54F"/>
+                    </svg>
+                </div>
+                <div class="icon-name">简约方形</div>
+                <div class="icon-desc">带标题栏的简约设计</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #FFC107"></span>
+                    <span class="color-dot" style="background: white; border: 1px solid #E0E0E0"></span>
+                </div>
+            </div>
+
+            <!-- 图标 11: 圆形图标 -->
+            <div class="icon-card" onclick="selectIcon(this, 11)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="55" fill="#FF7043"/>
+                        <circle cx="60" cy="60" r="48" fill="#FF8A65"/>
+                        <rect x="30" y="35" width="60" height="4" rx="2" fill="white"/>
+                        <rect x="30" y="45" width="50" height="4" rx="2" fill="rgba(255,255,255,0.7)"/>
+                        <rect x="30" y="55" width="55" height="4" rx="2" fill="rgba(255,255,255,0.7)"/>
+                        <rect x="30" y="65" width="45" height="4" rx="2" fill="rgba(255,255,255,0.7)"/>
+                        <circle cx="80" cy="80" r="15" fill="white" opacity="0.4"/>
+                        <text x="80" y="86" text-anchor="middle" font-family="Arial" font-size="18" fill="white">+</text>
+                    </svg>
+                </div>
+                <div class="icon-name">圆形图标</div>
+                <div class="icon-desc">圆形设计，适合应用图标</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #FF7043"></span>
+                    <span class="color-dot" style="background: #FF8A65"></span>
+                </div>
+            </div>
+
+            <!-- 图标 12: 渐变圆形 -->
+            <div class="icon-card" onclick="selectIcon(this, 12)">
+                <div class="icon-preview">
+                    <svg viewBox="0 0 120 120">
+                        <defs>
+                            <linearGradient id="grad12" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f093fb"/>
+                                <stop offset="100%" style="stop-color:#f5576c"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="60" cy="60" r="55" fill="url(#grad12)"/>
+                        <path d="M 35 40 L 85 40 L 85 90 L 60 75 L 35 90 Z" fill="white" opacity="0.9"/>
+                        <path d="M 60 75 L 85 90 L 60 90 Z" fill="rgba(255,255,255,0.7)"/>
+                    </svg>
+                </div>
+                <div class="icon-name">渐变圆形</div>
+                <div class="icon-desc">粉色渐变，信封式设计</div>
+                <div class="icon-colors">
+                    <span class="color-dot" style="background: #f093fb"></span>
+                    <span class="color-dot" style="background: #f5576c"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="downloadSelected()">📥 下载选中图标</button>
+            <button class="btn btn-secondary" onclick="downloadAll()">📦 下载所有图标</button>
+        </div>
+
+        <div class="footer">
+            <p>点击图标卡片选中，然后点击下载按钮</p>
+            <p>下载后请将图标文件替换到 <code>src-tauri/icons/</code> 目录</p>
+        </div>
+    </div>
+
+    <script>
+        let selectedIcon = null;
+
+        function selectIcon(element, iconNumber) {
+            // 移除之前的选中状态
+            document.querySelectorAll('.icon-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // 添加新的选中状态
+            element.classList.add('selected');
+            selectedIcon = iconNumber;
+        }
+
+        function downloadSelected() {
+            if (!selectedIcon) {
+                alert('请先选择一个图标！');
+                return;
+            }
+
+            // 获取选中的图标 SVG
+            const card = document.querySelectorAll('.icon-card')[selectedIcon - 1];
+            const svg = card.querySelector('svg');
+
+            // 创建下载链接
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `note-icon-${selectedIcon}.svg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            alert('图标已下载！\n\n下一步：\n1. 使用在线工具将 SVG 转换为 PNG 和 ICO\n2. 替换 src-tauri/icons/ 目录中的文件\n3. 重新构建应用：npm run tauri build');
+        }
+
+        function downloadAll() {
+            const cards = document.querySelectorAll('.icon-card');
+            cards.forEach((card, index) => {
+                const svg = card.querySelector('svg');
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(svgBlob);
+
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `note-icon-${index + 1}.svg`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, index * 200);
+            });
+
+            alert('所有图标已下载！\n\n下一步：\n1. 使用在线工具将 SVG 转换为 PNG 和 ICO\n2. 替换 src-tauri/icons/ 目录中的文件\n3. 重新构建应用：npm run tauri build');
+        }
+    </script>
+</body>
+</html>

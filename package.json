@@ -1,5 +1,5 @@
 {
-  "name": "tauri-app",
+  "name": "notes",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -13,6 +13,7 @@
     "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/plugin-dialog": "^2.7.1",
     "@tauri-apps/plugin-opener": "^2",
+    "@tauri-apps/plugin-process": "^2.3.1",
     "@tauri-apps/plugin-shell": "^2.3.5",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@types/uuid": "^10.0.0",

@@ -372,7 +372,6 @@ const RichEditor: React.FC<RichEditorProps> = ({
       const textarea = textareaRef.current;
       const cursorPos = textarea.selectionStart;
       const textBefore = textarea.value.substring(0, cursorPos);
-      const textAfter = textarea.value.substring(cursorPos);
 
       // 如果在行首或前面是空格/换行，显示菜单
       if (cursorPos === 0 || textBefore.endsWith('\n') || textBefore.endsWith(' ')) {
@@ -504,14 +503,79 @@ const RichEditor: React.FC<RichEditorProps> = ({
             </div>
             <div className="toolbar-divider" />
             <div className="toolbar-group">
+              <select
+                className="font-size-select"
+                onChange={(e) => {
+                  if (editorRef.current) {
+                    editorRef.current.focus();
+                    document.execCommand('fontSize', false, e.target.value);
+                    handleInput();
+                  }
+                }}
+                defaultValue="3"
+                title="字体大小"
+              >
+                <option value="1">小</option>
+                <option value="2">较小</option>
+                <option value="3">正常</option>
+                <option value="4">较大</option>
+                <option value="5">大</option>
+                <option value="6">很大</option>
+                <option value="7">最大</option>
+              </select>
+            </div>
+            <div className="toolbar-divider" />
+            <div className="toolbar-group">
               <button className="format-btn" onClick={() => document.execCommand('formatBlock', false, '<h2>')} title="标题">H</button>
               <button className="format-btn" onClick={() => document.execCommand('formatBlock', false, '<h3>')} title="小标题">h</button>
             </div>
             <div className="toolbar-divider" />
             <div className="toolbar-group">
-              <button className="format-btn" onClick={() => document.execCommand('insertUnorderedList')} title="列表">•</button>
+              <button className="format-btn" onClick={() => document.execCommand('insertUnorderedList')} title="无序列表">•</button>
               <button className="format-btn" onClick={() => document.execCommand('insertOrderedList')} title="有序列表">1.</button>
-              <button className="format-btn" onClick={() => document.execCommand('formatBlock', false, '<blockquote>')} title="引用">❝</button>
+              <button className="format-btn" onClick={() => {
+                if (editorRef.current) {
+                  editorRef.current.focus();
+                  const selection = window.getSelection();
+                  if (!selection || selection.rangeCount === 0) return;
+
+                  // 检查是否已经在引用块内
+                  let node = selection.anchorNode;
+                  let inBlockquote = false;
+                  while (node && node !== editorRef.current) {
+                    if (node.nodeName === 'BLOCKQUOTE') {
+                      inBlockquote = true;
+                      break;
+                    }
+                    node = node.parentNode;
+                  }
+
+                  if (inBlockquote) {
+                    // 如果已在引用块内，退出引用块
+                    document.execCommand('formatBlock', false, 'p');
+                  } else {
+                    // 获取选中的文本
+                    const range = selection.getRangeAt(0);
+                    const selectedText = range.toString();
+                    const quoteText = selectedText || '引用内容';
+
+                    // 创建引用块 HTML
+                    const html = `<blockquote>${quoteText}</blockquote><p><br></p>`;
+                    document.execCommand('insertHTML', false, html);
+
+                    // 将光标移到引用块后的空段落
+                    const newRange = document.createRange();
+                    const br = editorRef.current.querySelector('blockquote:last-of-type + p');
+                    if (br) {
+                      newRange.setStart(br, 0);
+                      newRange.collapse(true);
+                      selection.removeAllRanges();
+                      selection.addRange(newRange);
+                    }
+                  }
+                  handleInput();
+                }
+              }} title="引用">❝</button>
             </div>
           </div>
 

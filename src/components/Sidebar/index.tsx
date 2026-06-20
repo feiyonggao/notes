@@ -102,7 +102,7 @@ const Sidebar: React.FC = () => {
       <div className="sidebar-header">
         <div className="logo">
           <span className="logo-icon">📝</span>
-          <h1 className="logo-text">Rusty Notes</h1>
+          <h1 className="logo-text">Notes</h1>
         </div>
         <button className="btn-new-note" onClick={handleNewNote}>
           <span className="btn-icon">+</span>
@@ -263,7 +263,7 @@ const Sidebar: React.FC = () => {
       {/* 底部信息 */}
       <div className="sidebar-footer">
         <div className="footer-info">
-          <span>Rusty Notes v1.0</span>
+          <span>Notes v1.0</span>
           <span>•</span>
           <span>{notes.length} 个便签</span>
         </div>
