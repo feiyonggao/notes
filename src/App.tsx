@@ -231,54 +231,6 @@ function App() {
   if (isDesktopMode) {
     return (
       <div className="app desktop-mode-compact">
-        {/* 顶部窗口控制栏 */}
-        <div className="compact-window-bar">
-          <div className="window-bar-left">
-            <span className="window-icon">📌</span>
-          </div>
-          <div className="window-bar-right">
-            <button
-              className="window-btn minimize"
-              onClick={async () => {
-                try {
-                  await getCurrentWindow().minimize();
-                } catch (e) {
-                  console.error(e);
-                }
-              }}
-              title="最小化"
-            >
-              ─
-            </button>
-            <button
-              className="window-btn maximize"
-              onClick={async () => {
-                try {
-                  const window = getCurrentWindow();
-                  const isMaximized = await window.isMaximized();
-                  if (isMaximized) {
-                    await window.unmaximize();
-                  } else {
-                    await window.maximize();
-                  }
-                } catch (e) {
-                  console.error(e);
-                }
-              }}
-              title="最大化"
-            >
-              ☐
-            </button>
-            <button
-              className="window-btn close"
-              onClick={toggleDesktopMode}
-              title="退出桌面模式"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-
         {/* 便签内容区 - 最大化 */}
         <div className="compact-content">
           {desktopSelectedNote ? (
