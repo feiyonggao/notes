@@ -102,7 +102,7 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
         {/* 右侧：操作 */}
         <div className="topbar-actions">
           {isSaving && <span className="save-dot" />}
-          <button className="topbar-btn exit-btn" onClick={onExitDesktop} title="退出桌面模式">退出</button>
+          <button className="topbar-btn exit-btn" onClick={onExitDesktop} title="退出桌面模式">✕</button>
           <div className="menu-wrapper" ref={menuRef}>
             <button className="topbar-btn" onClick={() => setShowMenu(!showMenu)}>⋯</button>
             {showMenu && (
