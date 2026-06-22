@@ -2,7 +2,7 @@
 name = "notes"
 version = "1.2.0"
 description = "Notes - 一个现代化的便签应用"
-authors = ["you"]
+authors = ["feiyonggao"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
