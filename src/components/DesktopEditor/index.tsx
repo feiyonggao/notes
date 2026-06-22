@@ -94,7 +94,6 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
       <div className="compact-topbar">
         {/* 左侧：导航 */}
         <div className="topbar-nav">
-          <button className="topbar-btn exit-btn" onClick={onExitDesktop} title="退出桌面模式">✕</button>
           <button className="topbar-btn" onClick={onPrev} disabled={!canPrev}>‹</button>
           <span className="topbar-count">{noteIndex + 1}/{totalNotes}</span>
           <button className="topbar-btn" onClick={onNext} disabled={!canNext}>›</button>
@@ -103,6 +102,7 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
         {/* 右侧：操作 */}
         <div className="topbar-actions">
           {isSaving && <span className="save-dot" />}
+          <button className="topbar-btn exit-btn" onClick={onExitDesktop} title="退出桌面模式">退出</button>
           <div className="menu-wrapper" ref={menuRef}>
             <button className="topbar-btn" onClick={() => setShowMenu(!showMenu)}>⋯</button>
             {showMenu && (
