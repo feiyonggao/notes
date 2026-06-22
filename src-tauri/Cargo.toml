@@ -1,6 +1,6 @@
 [package]
 name = "notes"
-version = "0.1.0"
+version = "1.2.0"
 description = "Notes - 一个现代化的便签应用"
 authors = ["you"]
 edition = "2021"
