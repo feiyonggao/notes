@@ -289,7 +289,6 @@ function App() {
                 noteIndex={currentIndex}
                 totalNotes={notes.length}
                 onNewNote={handleNewNote}
-                onExit={toggleDesktopMode}
                 onPrev={switchToPrevNote}
                 onNext={switchToNextNote}
                 canPrev={currentIndex > 0 && !isAnimating}

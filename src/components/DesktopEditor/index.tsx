@@ -9,7 +9,6 @@ interface DesktopEditorProps {
   noteIndex: number;
   totalNotes: number;
   onNewNote: () => void;
-  onExit: () => void;
   onPrev: () => void;
   onNext: () => void;
   canPrev: boolean;
@@ -18,7 +17,7 @@ interface DesktopEditorProps {
 }
 
 const DesktopEditor: React.FC<DesktopEditorProps> = ({
-  note, noteIndex, totalNotes, onNewNote, onExit, onPrev, onNext, canPrev, canNext, onClose
+  note, noteIndex, totalNotes, onNewNote, onPrev, onNext, canPrev, canNext, onClose
 }) => {
   const { updateNote, deleteNote, togglePin, loadTags, loadStats } = useNoteStore();
 
@@ -102,7 +101,6 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
         {/* 右侧：操作 */}
         <div className="topbar-actions">
           {isSaving && <span className="save-dot" />}
-          <button className="topbar-btn exit-btn" onClick={onExit} title="退出桌面模式">✕</button>
           <div className="menu-wrapper" ref={menuRef}>
             <button className="topbar-btn" onClick={() => setShowMenu(!showMenu)}>⋯</button>
             {showMenu && (
