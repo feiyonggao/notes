@@ -51,22 +51,80 @@ const Sidebar: React.FC = () => {
     await loadStats();
   }, [loadNotes, loadTags, loadStats]);
 
+  // 导出便签为 TXT 格式
+  const exportAsTxt = (notesList: any[]): string => {
+    return notesList.map(note => {
+      const title = note.title || '无标题';
+      const content = note.content || '';
+      // 移除 HTML 标签
+      const plainContent = content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+      const date = new Date(note.updated_at).toLocaleString('zh-CN');
+      const tags = note.tags.length > 0 ? `标签: ${note.tags.join(', ')}` : '';
+      return `【${title}】\n${tags ? tags + '\n' : ''}更新时间: ${date}\n\n${plainContent}\n\n${'='.repeat(50)}\n`;
+    }).join('\n');
+  };
+
+  // 导出便签为 Markdown 格式
+  const exportAsMarkdown = (notesList: any[]): string => {
+    return notesList.map(note => {
+      const title = note.title || '无标题';
+      const content = note.content || '';
+      // 移除 HTML 标签，保留基本格式
+      let mdContent = content
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/p>/gi, '\n')
+        .replace(/<\/div>/gi, '\n')
+        .replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n')
+        .replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n')
+        .replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n')
+        .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**')
+        .replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**')
+        .replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*')
+        .replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*')
+        .replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)')
+        .replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>');
+      const date = new Date(note.updated_at).toLocaleString('zh-CN');
+      const tags = note.tags.length > 0 ? `> 标签: ${note.tags.join(', ')}` : '';
+      return `# ${title}\n\n${tags ? tags + '\n' : ''}> 更新时间: ${date}\n\n${mdContent}\n\n---\n`;
+    }).join('\n');
+  };
+
   // 导出便签
   const handleExport = useCallback(async () => {
     try {
       setIsExporting(true);
-      const json = await exportNotes();
 
       const filePath = await save({
-        defaultPath: 'notes-backup.json',
-        filters: [{
-          name: 'JSON',
-          extensions: ['json']
-        }]
+        defaultPath: 'notes-backup',
+        filters: [
+          { name: 'JSON 文件', extensions: ['json'] },
+          { name: '文本文件', extensions: ['txt'] },
+          { name: 'Markdown 文件', extensions: ['md'] },
+        ]
       });
 
       if (filePath) {
-        await writeTextFile(filePath, json);
+        const json = await exportNotes();
+        const store = JSON.parse(json);
+        const notesList = store.notes || [];
+
+        let content = '';
+        const ext = filePath.split('.').pop()?.toLowerCase();
+
+        if (ext === 'txt') {
+          content = exportAsTxt(notesList);
+        } else if (ext === 'md') {
+          content = exportAsMarkdown(notesList);
+        } else {
+          content = json;
+        }
+
+        await writeTextFile(filePath, content);
         alert('导出成功！');
       }
     } catch (error) {
@@ -77,6 +135,142 @@ const Sidebar: React.FC = () => {
     }
   }, [exportNotes]);
 
+  // 从 TXT 导入便签
+  const importFromTxt = async (content: string): Promise<number> => {
+    // 按分隔符分割便签
+    const sections = content.split(/={50}/).filter(s => s.trim());
+    let imported = 0;
+
+    for (const section of sections) {
+      const lines = section.trim().split('\n').filter(l => l.trim());
+      if (lines.length === 0) continue;
+
+      let title = '导入的便签';
+      let noteContent = '';
+
+      // 解析标题（【标题】格式）
+      const titleMatch = lines[0].match(/【(.+?)】/);
+      if (titleMatch) {
+        title = titleMatch[1];
+        lines.shift();
+      }
+
+      // 跳过标签和时间行
+      const contentStart = lines.findIndex(l => !l.startsWith('标签:') && !l.startsWith('更新时间:'));
+      if (contentStart >= 0) {
+        noteContent = lines.slice(contentStart).join('\n').trim();
+      }
+
+      if (title || noteContent) {
+        // 转换为 HTML 格式
+        const htmlContent = contentStart >= 0
+          ? noteContent.replace(/\n/g, '<br>')
+          : '';
+
+        const json = JSON.stringify({
+          notes: [{
+            id: crypto.randomUUID(),
+            title: title,
+            content: htmlContent,
+            color: 'Yellow',
+            tags: [],
+            is_pinned: false,
+            is_markdown: false,
+            x: 100,
+            y: 100,
+            width: 300,
+            height: 300,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            attachments: []
+          }],
+          settings: {},
+          version: 1
+        });
+
+        const count = await importNotes(json);
+        imported += count;
+      }
+    }
+
+    return imported;
+  };
+
+  // 从 Markdown 导入便签
+  const importFromMarkdown = async (content: string): Promise<number> => {
+    // 按 --- 分割便签
+    const sections = content.split(/\n---\n/).filter(s => s.trim());
+    let imported = 0;
+
+    for (const section of sections) {
+      const lines = section.trim().split('\n');
+      if (lines.length === 0) continue;
+
+      let title = '导入的便签';
+      let noteContent = '';
+      let tags: string[] = [];
+
+      // 解析标题（# 标题格式）
+      const titleMatch = lines[0].match(/^#\s+(.+)/);
+      if (titleMatch) {
+        title = titleMatch[1].trim();
+        lines.shift();
+      }
+
+      // 解析标签（> 标签: xxx 格式）
+      const tagLine = lines.find(l => l.startsWith('> 标签:'));
+      if (tagLine) {
+        const tagMatch = tagLine.match(/> 标签:\s*(.+)/);
+        if (tagMatch) {
+          tags = tagMatch[1].split(',').map(t => t.trim()).filter(t => t);
+        }
+      }
+
+      // 跳过引用行（标签和时间）
+      const contentLines = lines.filter(l => !l.startsWith('>') || l.startsWith('> ') && !l.startsWith('> 标签:') && !l.startsWith('> 更新时间:'));
+      noteContent = contentLines.join('\n').trim();
+
+      if (title || noteContent) {
+        // 转换 Markdown 为 HTML
+        let htmlContent = noteContent
+          .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+          .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+          .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+          .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
+          .replace(/^- (.*$)/gm, '<li>$1</li>')
+          .replace(/\n/g, '<br>');
+
+        const json = JSON.stringify({
+          notes: [{
+            id: crypto.randomUUID(),
+            title: title,
+            content: htmlContent,
+            color: 'Yellow',
+            tags: tags,
+            is_pinned: false,
+            is_markdown: false,
+            x: 100,
+            y: 100,
+            width: 300,
+            height: 300,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            attachments: []
+          }],
+          settings: {},
+          version: 1
+        });
+
+        const count = await importNotes(json);
+        imported += count;
+      }
+    }
+
+    return imported;
+  };
+
   // 导入便签
   const handleImport = useCallback(async () => {
     try {
@@ -84,15 +278,27 @@ const Sidebar: React.FC = () => {
 
       const filePath = await open({
         multiple: false,
-        filters: [{
-          name: 'JSON',
-          extensions: ['json']
-        }]
+        filters: [
+          { name: '所有支持的格式', extensions: ['json', 'txt', 'md'] },
+          { name: 'JSON 文件', extensions: ['json'] },
+          { name: '文本文件', extensions: ['txt'] },
+          { name: 'Markdown 文件', extensions: ['md'] },
+        ]
       });
 
       if (filePath) {
-        const json = await readTextFile(filePath as string);
-        const count = await importNotes(json);
+        const content = await readTextFile(filePath as string);
+        const ext = (filePath as string).split('.').pop()?.toLowerCase();
+
+        let count = 0;
+        if (ext === 'txt') {
+          count = await importFromTxt(content);
+        } else if (ext === 'md') {
+          count = await importFromMarkdown(content);
+        } else {
+          count = await importNotes(content);
+        }
+
         alert(`导入成功！导入了 ${count} 个便签。`);
       }
     } catch (error) {

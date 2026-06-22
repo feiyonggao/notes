@@ -21,8 +21,8 @@
 .reminder-panel {
   background: white;
   border-radius: 16px;
-  width: 400px;
-  max-height: 80vh;
+  width: 420px;
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
@@ -78,6 +78,106 @@
   padding: 20px 24px;
 }
 
+/* 快捷选项 */
+.quick-options {
+  margin-bottom: 20px;
+}
+
+.quick-options label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  margin-bottom: 10px;
+}
+
+.quick-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quick-btn {
+  padding: 8px 14px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 20px;
+  font-size: 13px;
+  color: #3b82f6;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.quick-btn:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+.quick-btn:active {
+  transform: translateY(0);
+}
+
+/* 时间选择区域 */
+.time-picker-section {
+  margin-bottom: 16px;
+}
+
+.time-picker-section label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  margin-bottom: 10px;
+}
+
+.time-inputs {
+  display: flex;
+  gap: 12px;
+}
+
+.date-input-wrapper,
+.time-input-wrapper {
+  flex: 1;
+}
+
+.date-input,
+.time-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.85);
+  background: white;
+  transition: border-color 0.15s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.date-input:focus,
+.time-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.show-quick-btn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  color: #3b82f6;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.show-quick-btn:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
 .form-group {
   margin-bottom: 16px;
 }
@@ -90,7 +190,6 @@
   margin-bottom: 8px;
 }
 
-.form-group input[type="datetime-local"],
 .form-group input[type="text"],
 .form-group select {
   width: 100%;
@@ -102,6 +201,7 @@
   background: white;
   transition: border-color 0.15s ease;
   outline: none;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -172,6 +272,9 @@
 
 .reminder-list {
   padding: 0 24px 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  padding-top: 16px;
 }
 
 .reminder-list h4 {

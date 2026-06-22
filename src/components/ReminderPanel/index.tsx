@@ -8,15 +8,34 @@ interface ReminderPanelProps {
   onClose: () => void;
 }
 
+// 快捷时间选项
+const QUICK_OPTIONS = [
+  { label: '30分钟后', getValue: () => { const d = new Date(); d.setMinutes(d.getMinutes() + 30); return d; } },
+  { label: '1小时后', getValue: () => { const d = new Date(); d.setHours(d.getHours() + 1); return d; } },
+  { label: '2小时后', getValue: () => { const d = new Date(); d.setHours(d.getHours() + 2); return d; } },
+  { label: '明天上午9点', getValue: () => { const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0); return d; } },
+  { label: '明天下午2点', getValue: () => { const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(14, 0, 0, 0); return d; } },
+  { label: '明天晚上8点', getValue: () => { const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(20, 0, 0, 0); return d; } },
+  { label: '下周一上午9点', getValue: () => {
+    const d = new Date();
+    const daysUntilMonday = (8 - d.getDay()) % 7 || 7;
+    d.setDate(d.getDate() + daysUntilMonday);
+    d.setHours(9, 0, 0, 0);
+    return d;
+  }},
+];
+
 export default function ReminderPanel({ noteId, onClose }: ReminderPanelProps) {
   const { reminders, loadNoteReminders, createReminder, updateReminder, deleteReminder } = useNoteStore();
 
-  const [remindAt, setRemindAt] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
   const [repeatRule, setRepeatRule] = useState<RepeatRule>('None');
   const [notifySystem, setNotifySystem] = useState(true);
   const [notifySound, setNotifySound] = useState(true);
   const [memo, setMemo] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [showQuickOptions, setShowQuickOptions] = useState(true);
 
   useEffect(() => {
     loadNoteReminders(noteId);
@@ -25,23 +44,36 @@ export default function ReminderPanel({ noteId, onClose }: ReminderPanelProps) {
   // 过滤当前便签的提醒
   const noteReminders = reminders.filter(r => r.note_id === noteId);
 
-  // 设置默认时间为当前时间后 1 小时
+  // 设置默认时间
   useEffect(() => {
     const now = new Date();
     now.setHours(now.getHours() + 1);
     now.setMinutes(0, 0, 0);
-    const formatted = now.toISOString().slice(0, 16);
-    setRemindAt(formatted);
+    setSelectedDate(now.toISOString().slice(0, 10));
+    setSelectedTime(now.toTimeString().slice(0, 5));
   }, []);
 
+  // 快捷选择时间
+  const handleQuickOption = (getValue: () => Date) => {
+    const date = getValue();
+    setSelectedDate(date.toISOString().slice(0, 10));
+    setSelectedTime(date.toTimeString().slice(0, 5));
+    setShowQuickOptions(false);
+  };
+
   const handleSubmit = async () => {
-    if (!remindAt) {
+    if (!selectedDate || !selectedTime) {
       alert('请选择提醒时间');
       return;
     }
 
     try {
-      const remindDate = new Date(remindAt);
+      const remindDate = new Date(`${selectedDate}T${selectedTime}:00`);
+      if (isNaN(remindDate.getTime())) {
+        alert('无效的时间格式');
+        return;
+      }
+
       if (editingId) {
         await updateReminder(editingId, remindDate, repeatRule, notifySystem, notifySound, memo || undefined);
         setEditingId(null);
@@ -50,28 +82,36 @@ export default function ReminderPanel({ noteId, onClose }: ReminderPanelProps) {
       }
 
       // 重置表单
-      const now = new Date();
-      now.setHours(now.getHours() + 1);
-      now.setMinutes(0, 0, 0);
-      setRemindAt(now.toISOString().slice(0, 16));
-      setRepeatRule('None');
-      setNotifySystem(true);
-      setNotifySound(true);
-      setMemo('');
+      resetForm();
     } catch (error) {
       console.error('保存提醒失败:', error);
       alert('保存提醒失败');
     }
   };
 
+  const resetForm = () => {
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    now.setMinutes(0, 0, 0);
+    setSelectedDate(now.toISOString().slice(0, 10));
+    setSelectedTime(now.toTimeString().slice(0, 5));
+    setRepeatRule('None');
+    setNotifySystem(true);
+    setNotifySound(true);
+    setMemo('');
+    setShowQuickOptions(true);
+  };
+
   const handleEdit = (reminder: Reminder) => {
     setEditingId(reminder.id);
     const date = new Date(reminder.remind_at);
-    setRemindAt(date.toISOString().slice(0, 16));
+    setSelectedDate(date.toISOString().slice(0, 10));
+    setSelectedTime(date.toTimeString().slice(0, 5));
     setRepeatRule(reminder.repeat_rule);
     setNotifySystem(reminder.notify_system);
     setNotifySound(reminder.notify_sound);
     setMemo(reminder.memo || '');
+    setShowQuickOptions(false);
   };
 
   const handleDelete = async (id: string) => {
@@ -86,14 +126,7 @@ export default function ReminderPanel({ noteId, onClose }: ReminderPanelProps) {
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    const now = new Date();
-    now.setHours(now.getHours() + 1);
-    now.setMinutes(0, 0, 0);
-    setRemindAt(now.toISOString().slice(0, 16));
-    setRepeatRule('None');
-    setNotifySystem(true);
-    setNotifySound(true);
-    setMemo('');
+    resetForm();
   };
 
   const formatRepeatRule = (rule: RepeatRule): string => {
@@ -122,6 +155,11 @@ export default function ReminderPanel({ noteId, onClose }: ReminderPanelProps) {
     return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) + ' ' + timeStr;
   };
 
+  // 获取今天的日期字符串（用于设置 min 属性）
+  const getTodayStr = () => {
+    return new Date().toISOString().slice(0, 10);
+  };
+
   return (
     <div className="reminder-panel-overlay" onClick={onClose}>
       <div className="reminder-panel" onClick={e => e.stopPropagation()}>
@@ -131,14 +169,54 @@ export default function ReminderPanel({ noteId, onClose }: ReminderPanelProps) {
         </div>
 
         <div className="reminder-form">
-          <div className="form-group">
-            <label>提醒时间</label>
-            <input
-              type="datetime-local"
-              value={remindAt}
-              onChange={e => setRemindAt(e.target.value)}
-              min={new Date().toISOString().slice(0, 16)}
-            />
+          {/* 快捷选项 */}
+          {showQuickOptions && !editingId && (
+            <div className="quick-options">
+              <label>快捷选择</label>
+              <div className="quick-buttons">
+                {QUICK_OPTIONS.map((option, index) => (
+                  <button
+                    key={index}
+                    className="quick-btn"
+                    onClick={() => handleQuickOption(option.getValue)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 自定义时间选择 */}
+          <div className="time-picker-section">
+            <label>{showQuickOptions ? '或自定义时间' : '提醒时间'}</label>
+            <div className="time-inputs">
+              <div className="date-input-wrapper">
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={e => setSelectedDate(e.target.value)}
+                  min={getTodayStr()}
+                  className="date-input"
+                />
+              </div>
+              <div className="time-input-wrapper">
+                <input
+                  type="time"
+                  value={selectedTime}
+                  onChange={e => setSelectedTime(e.target.value)}
+                  className="time-input"
+                />
+              </div>
+            </div>
+            {!showQuickOptions && !editingId && (
+              <button
+                className="show-quick-btn"
+                onClick={() => setShowQuickOptions(true)}
+              >
+                显示快捷选项
+              </button>
+            )}
           </div>
 
           <div className="form-group">
@@ -148,7 +226,7 @@ export default function ReminderPanel({ noteId, onClose }: ReminderPanelProps) {
               onChange={e => {
                 const value = e.target.value;
                 if (value === 'Custom') {
-                  const custom = prompt('请输入 cron 表达式 (例: 0 9 * * 1-5)');
+                  const custom = prompt('请输入 cron 表达式\n\n示例:\n• 每个工作日: 0 9 * * 1-5\n• 每月1号: 0 9 1 * *\n• 每年生日: 0 9 15 6 *');
                   if (custom) {
                     setRepeatRule({ Custom: custom });
                   }
