@@ -100,11 +100,11 @@ const Sidebar: React.FC = () => {
       setIsExporting(true);
 
       const filePath = await save({
-        defaultPath: 'notes-backup',
+        defaultPath: 'notes-backup.txt',
         filters: [
-          { name: 'JSON 文件', extensions: ['json'] },
           { name: '文本文件', extensions: ['txt'] },
           { name: 'Markdown 文件', extensions: ['md'] },
+          { name: 'JSON 文件', extensions: ['json'] },
         ]
       });
 

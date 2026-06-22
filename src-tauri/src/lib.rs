@@ -6,6 +6,7 @@ mod tray;
 use database::Database;
 use tauri::Manager;
 use tauri_plugin_autostart::MacosLauncher;
+use tauri_plugin_notification::NotificationExt;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -13,6 +14,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             // 当尝试打开第二个实例时，将现有窗口带到前台
             if let Some(window) = app.get_webview_window("main") {
@@ -46,6 +48,49 @@ pub fn run() {
             // 创建系统托盘
             tray::create_tray(app.handle())?;
 
+            // 启动提醒检查任务
+            let app_handle = app.handle().clone();
+            std::thread::spawn(move || {
+                loop {
+                    // 每 30 秒检查一次提醒
+                    std::thread::sleep(std::time::Duration::from_secs(30));
+
+                    // 获取数据库
+                    if let Some(db) = app_handle.try_state::<Database>() {
+                        // 获取到期的提醒
+                        if let Ok(reminders) = db.get_due_reminders() {
+                            for reminder in reminders {
+                                // 获取便签标题
+                                let note_title = db.get_note(&reminder.note_id)
+                                    .ok()
+                                    .flatten()
+                                    .map(|n| n.title)
+                                    .unwrap_or_else(|| "无标题便签".to_string());
+
+                                let title = "便签提醒";
+                                let body = if let Some(memo) = &reminder.memo {
+                                    format!("{}: {}", note_title, memo)
+                                } else {
+                                    format!("{} 的提醒时间到了", note_title)
+                                };
+
+                                // 发送系统通知
+                                if reminder.notify_system {
+                                    let _ = app_handle.notification()
+                                        .builder()
+                                        .title(title)
+                                        .body(&body)
+                                        .show();
+                                }
+
+                                // 停用提醒
+                                let _ = db.deactivate_reminder(&reminder.id);
+                            }
+                        }
+                    }
+                }
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -78,6 +123,7 @@ pub fn run() {
             commands::update_reminder,
             commands::delete_reminder,
             commands::get_due_reminders,
+            commands::deactivate_reminder,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

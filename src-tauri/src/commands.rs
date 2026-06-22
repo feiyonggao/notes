@@ -330,3 +330,12 @@ pub async fn get_due_reminders(
 ) -> Result<Vec<Reminder>, String> {
     db.get_due_reminders()
 }
+
+/// 停用提醒
+#[tauri::command]
+pub async fn deactivate_reminder(
+    id: String,
+    db: State<'_, Database>,
+) -> Result<(), String> {
+    db.deactivate_reminder(&id)
+}

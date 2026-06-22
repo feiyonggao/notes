@@ -1038,6 +1038,17 @@ impl Database {
         Ok(())
     }
 
+    /// 停用提醒（标记为已触发）
+    pub fn deactivate_reminder(&self, id: &str) -> Result<(), String> {
+        let conn = self.conn.lock()
+            .map_err(|e| format!("获取锁失败: {}", e))?;
+
+        conn.execute("UPDATE reminders SET is_active = 0 WHERE id = ?1", params![id])
+            .map_err(|e| format!("停用提醒失败: {}", e))?;
+
+        Ok(())
+    }
+
     /// 获取即将到期的提醒（用于通知）
     pub fn get_due_reminders(&self) -> Result<Vec<Reminder>, String> {
         let conn = self.conn.lock()

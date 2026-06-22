@@ -9,6 +9,7 @@ import About from './components/About';
 import { Note } from './types/note';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWindow, LogicalSize, LogicalPosition, currentMonitor } from '@tauri-apps/api/window';
+import { isPermissionGranted, requestPermission } from '@tauri-apps/plugin-notification';
 import './styles/theme.css';
 import './App.css';
 
@@ -39,6 +40,18 @@ function App() {
       await loadTags();
       await loadSettings();
       await loadStats();
+
+      // 请求通知权限
+      try {
+        let permissionGranted = await isPermissionGranted();
+        if (!permissionGranted) {
+          const permission = await requestPermission();
+          permissionGranted = permission === 'granted';
+        }
+        console.log('通知权限:', permissionGranted ? '已授予' : '未授予');
+      } catch (error) {
+        console.error('请求通知权限失败:', error);
+      }
     };
     init();
   }, []);
