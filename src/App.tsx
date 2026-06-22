@@ -53,6 +53,30 @@ function App() {
     }
   }, [notes, isDesktopMode, desktopSelectedNote]);
 
+  // 播放提醒声音
+  const playReminderSound = useCallback(() => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
+
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (e) {
+      console.error('播放声音失败:', e);
+    }
+  }, []);
+
   useEffect(() => {
     const unlistenNewNote = listen('tray-new-note', async () => {
       const note = await createNote();
@@ -79,6 +103,9 @@ function App() {
         await window.setFocus();
       } catch (e) { console.error(e); }
     });
+    const unlistenSound = listen('play-reminder-sound', () => {
+      playReminderSound();
+    });
 
     return () => {
       unlistenNewNote.then(fn => fn());
@@ -87,8 +114,9 @@ function App() {
       unlistenSettings.then(fn => fn());
       unlistenAbout.then(fn => fn());
       unlistenClick.then(fn => fn());
+      unlistenSound.then(fn => fn());
     };
-  }, [createNote, isDesktopMode]);
+  }, [createNote, isDesktopMode, playReminderSound]);
 
   const handleNewNote = useCallback(async () => {
     const note = await createNote();

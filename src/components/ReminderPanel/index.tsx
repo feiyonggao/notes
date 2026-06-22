@@ -32,7 +32,7 @@ export default function ReminderPanel({ noteId, onClose }: ReminderPanelProps) {
   const [selectedTime, setSelectedTime] = useState('');
   const [repeatRule, setRepeatRule] = useState<RepeatRule>('None');
   const [notifySystem, setNotifySystem] = useState(true);
-  const [notifySound, setNotifySound] = useState(true);
+  const [notifySound, setNotifySound] = useState(false);
   const [memo, setMemo] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showQuickOptions, setShowQuickOptions] = useState(true);
@@ -97,7 +97,7 @@ export default function ReminderPanel({ noteId, onClose }: ReminderPanelProps) {
     setSelectedTime(now.toTimeString().slice(0, 5));
     setRepeatRule('None');
     setNotifySystem(true);
-    setNotifySound(true);
+    setNotifySound(false);
     setMemo('');
     setShowQuickOptions(true);
   };

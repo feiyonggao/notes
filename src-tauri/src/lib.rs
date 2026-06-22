@@ -4,7 +4,7 @@ mod commands;
 mod tray;
 
 use database::Database;
-use tauri::Manager;
+use tauri::{Manager, Emitter};
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_notification::NotificationExt;
 
@@ -84,6 +84,11 @@ pub fn run() {
                                         Ok(_) => println!("通知已发送"),
                                         Err(e) => println!("发送通知失败: {}", e),
                                     }
+                                }
+
+                                // 发送声音提醒事件到前端
+                                if reminder.notify_sound {
+                                    let _ = app_handle.emit("play-reminder-sound", ());
                                 }
 
                                 // 停用提醒
