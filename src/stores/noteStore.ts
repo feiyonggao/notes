@@ -52,6 +52,7 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
     always_on_top: false,
     show_in_taskbar: true,
     auto_save: true,
+    auto_start: true,
     font_size: 14,
     font_family: 'Microsoft YaHei',
     data_path: '',

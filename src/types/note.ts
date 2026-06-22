@@ -42,6 +42,7 @@ export interface AppSettings {
   always_on_top: boolean;
   show_in_taskbar: boolean;
   auto_save: boolean;
+  auto_start: boolean;
   font_size: number;
   font_family: string;
   data_path: string;

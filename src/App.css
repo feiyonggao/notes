@@ -19,6 +19,59 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
+/* 窗口控制栏 */
+.compact-window-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.03);
+  -webkit-app-region: drag;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.window-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.window-icon {
+  font-size: 16px;
+}
+
+.window-bar-right {
+  display: flex;
+  gap: 2px;
+  -webkit-app-region: no-drag;
+}
+
+.window-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.window-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.window-btn.close:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
 /* 自定义标题栏 */
 .compact-titlebar {
   display: flex;

@@ -5,6 +5,7 @@ mod tray;
 
 use database::Database;
 use tauri::Manager;
+use tauri_plugin_autostart::MacosLauncher;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -19,6 +20,7 @@ pub fn run() {
                 let _ = window.unminimize();
             }
         }))
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec![])))
         .setup(|app| {
             // 初始化数据库
             let db = Database::new(&app.handle())?;

@@ -77,6 +77,7 @@ pub struct AppSettings {
     pub always_on_top: bool,
     pub show_in_taskbar: bool,
     pub auto_save: bool,
+    pub auto_start: bool,
     pub font_size: u32,
     pub font_family: String,
     pub data_path: String,
@@ -91,6 +92,7 @@ impl Default for AppSettings {
             always_on_top: false,
             show_in_taskbar: true,
             auto_save: true,
+            auto_start: true, // 默认开启自启动
             font_size: 14,
             font_family: "Microsoft YaHei".to_string(),
             data_path: String::new(), // 空字符串表示使用默认路径

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNoteStore } from '../../stores/noteStore';
 import { COLORS } from '../../types/note';
 import { open } from '@tauri-apps/plugin-dialog';
+import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 import Modal from '../Modal';
 import './styles.css';
 
@@ -23,19 +24,41 @@ const Settings: React.FC<SettingsProps> = ({ isOpen, onClose }) => {
   const [localSettings, setLocalSettings] = useState(settings);
   const [pathStatus, setPathStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
   const [pathError, setPathError] = useState('');
+  const [autoStartEnabled, setAutoStartEnabled] = useState(false);
 
   // 同步设置
   useEffect(() => {
     setLocalSettings(settings);
   }, [settings]);
 
-  // 加载数据目录信息
+  // 加载数据目录信息和自启动状态
   useEffect(() => {
     if (isOpen) {
       loadDataDir();
       loadDefaultDataDir();
+      // 检查自启动状态
+      isEnabled().then(enabled => {
+        setAutoStartEnabled(enabled);
+      }).catch(err => {
+        console.error('检查自启动状态失败:', err);
+      });
     }
   }, [isOpen]);
+
+  // 处理自启动切换
+  const handleAutoStartToggle = async (checked: boolean) => {
+    try {
+      if (checked) {
+        await enable();
+      } else {
+        await disable();
+      }
+      setAutoStartEnabled(checked);
+      setLocalSettings({ ...localSettings, auto_start: checked });
+    } catch (err) {
+      console.error('设置自启动失败:', err);
+    }
+  };
 
   // 处理保存
   const handleSave = async () => {
@@ -52,6 +75,7 @@ const Settings: React.FC<SettingsProps> = ({ isOpen, onClose }) => {
       always_on_top: false,
       show_in_taskbar: true,
       auto_save: true,
+      auto_start: true,
       font_size: 14,
       font_family: 'Microsoft YaHei',
       data_path: '',
@@ -237,6 +261,16 @@ const Settings: React.FC<SettingsProps> = ({ isOpen, onClose }) => {
         <div className="setting-group">
           <label className="setting-label">⚙️ 其他选项</label>
           <div className="toggle-options">
+            <label className="toggle-option">
+              <span>开机自启动</span>
+              <input
+                type="checkbox"
+                checked={autoStartEnabled}
+                onChange={e => handleAutoStartToggle(e.target.checked)}
+              />
+              <span className="toggle-slider"></span>
+            </label>
+
             <label className="toggle-option">
               <span>窗口置顶</span>
               <input
