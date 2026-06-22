@@ -21,11 +21,13 @@
 .reminder-panel {
   background: white;
   border-radius: 16px;
-  width: 420px;
-  max-height: 85vh;
-  overflow-y: auto;
+  width: 380px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
+  overflow: hidden;
 }
 
 @keyframes slideUp {
@@ -43,28 +45,31 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
+  padding: 16px 20px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  background: white;
+  border-radius: 16px 16px 0 0;
 }
 
 .reminder-header h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.85);
 }
 
 .close-btn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
   color: rgba(0, 0, 0, 0.5);
   transition: all 0.15s ease;
 }
@@ -75,34 +80,36 @@
 }
 
 .reminder-form {
-  padding: 20px 24px;
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex: 1;
 }
 
 /* 快捷选项 */
 .quick-options {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .quick-options label {
   display: block;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.7);
-  margin-bottom: 10px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 8px;
 }
 
 .quick-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .quick-btn {
-  padding: 8px 14px;
-  background: rgba(59, 130, 246, 0.08);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 5px 10px;
+  background: rgba(59, 130, 246, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 14px;
+  font-size: 12px;
   color: #3b82f6;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -110,31 +117,30 @@
 }
 
 .quick-btn:hover {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.4);
-  transform: translateY(-1px);
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .quick-btn:active {
-  transform: translateY(0);
+  transform: scale(0.97);
 }
 
 /* 时间选择区域 */
 .time-picker-section {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .time-picker-section label {
   display: block;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.7);
-  margin-bottom: 10px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 8px;
 }
 
 .time-inputs {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .date-input-wrapper,
@@ -145,10 +151,10 @@
 .date-input,
 .time-input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   color: rgba(0, 0, 0, 0.85);
   background: white;
   transition: border-color 0.15s ease;
@@ -159,12 +165,12 @@
 .date-input:focus,
 .time-input:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 .show-quick-btn {
-  margin-top: 8px;
-  padding: 6px 12px;
+  margin-top: 6px;
+  padding: 4px 8px;
   background: transparent;
   border: none;
   font-size: 12px;
@@ -174,29 +180,28 @@
 }
 
 .show-quick-btn:hover {
-  color: #2563eb;
   text-decoration: underline;
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .form-group label {
   display: block;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.7);
-  margin-bottom: 8px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 6px;
 }
 
 .form-group input[type="text"],
 .form-group select {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   color: rgba(0, 0, 0, 0.85);
   background: white;
   transition: border-color 0.15s ease;
@@ -207,44 +212,44 @@
 .form-group input:focus,
 .form-group select:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 .checkbox-group {
   display: flex;
-  gap: 20px;
+  gap: 16px;
 }
 
 .checkbox-group label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   color: rgba(0, 0, 0, 0.7);
 }
 
 .checkbox-group input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
   accent-color: #3b82f6;
 }
 
 .form-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: flex-end;
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
 .btn-primary {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background: #3b82f6;
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -255,12 +260,12 @@
 }
 
 .btn-cancel {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background: rgba(0, 0, 0, 0.06);
   color: rgba(0, 0, 0, 0.7);
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -271,17 +276,17 @@
 }
 
 .reminder-list {
-  padding: 0 24px 20px;
+  padding: 0 20px 16px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   margin-top: 4px;
-  padding-top: 16px;
+  padding-top: 12px;
 }
 
 .reminder-list h4 {
-  margin: 0 0 12px;
-  font-size: 14px;
+  margin: 0 0 10px;
+  font-size: 12px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgba(0, 0, 0, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -290,10 +295,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px;
+  padding: 10px;
   background: rgba(0, 0, 0, 0.03);
   border-radius: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   transition: all 0.15s ease;
 }
 
@@ -310,40 +315,40 @@
 }
 
 .reminder-time {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.85);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .reminder-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .repeat-badge {
-  padding: 2px 8px;
+  padding: 1px 6px;
   background: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
 }
 
 .memo-text {
-  font-size: 12px;
+  font-size: 11px;
   color: rgba(0, 0, 0, 0.5);
 }
 
 .reminder-actions {
   display: flex;
-  gap: 4px;
+  gap: 2px;
 }
 
 .btn-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -351,7 +356,7 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   transition: all 0.15s ease;
 }
 
@@ -364,19 +369,19 @@
 }
 
 /* 滚动条 */
-.reminder-panel::-webkit-scrollbar {
-  width: 6px;
+.reminder-form::-webkit-scrollbar {
+  width: 4px;
 }
 
-.reminder-panel::-webkit-scrollbar-track {
+.reminder-form::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.reminder-panel::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
+.reminder-form::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
 }
 
-.reminder-panel::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+.reminder-form::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
 }

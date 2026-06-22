@@ -76,11 +76,14 @@ pub fn run() {
 
                                 // 发送系统通知
                                 if reminder.notify_system {
-                                    let _ = app_handle.notification()
+                                    match app_handle.notification()
                                         .builder()
                                         .title(title)
                                         .body(&body)
-                                        .show();
+                                        .show() {
+                                        Ok(_) => println!("通知已发送"),
+                                        Err(e) => println!("发送通知失败: {}", e),
+                                    }
                                 }
 
                                 // 停用提醒
