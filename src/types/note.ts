@@ -51,6 +51,29 @@ export interface AppSettings {
 /// 附件类型
 export type AttachmentType = 'Image' | 'Document' | 'Audio' | 'Video' | 'Other';
 
+/// 重复规则
+export type RepeatRule = 'None' | 'Daily' | 'Weekly' | 'Monthly' | 'Yearly' | { Custom: string };
+
+/// 提醒数据
+export interface Reminder {
+  id: string;
+  note_id: string;
+  remind_at: string;
+  repeat_rule: RepeatRule;
+  notify_system: boolean;
+  notify_sound: boolean;
+  memo: string | null;
+  is_active: boolean;
+  created_at: string;
+}
+
+/// 便签存储数据（用于导入导出）
+export interface NotesStore {
+  notes: Note[];
+  settings: AppSettings;
+  version: number;
+}
+
 /// 附件
 export interface Attachment {
   id: string;

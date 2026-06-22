@@ -1,5 +1,6 @@
 use tauri::State;
-use crate::models::{Note, AppSettings, Attachment, AttachmentType};
+use chrono::{DateTime, Utc};
+use crate::models::{Note, AppSettings, Attachment, AttachmentType, Reminder, RepeatRule};
 use crate::database::Database;
 
 /// 获取所有便签
@@ -266,4 +267,66 @@ pub async fn get_attachment_data(
 
     std::fs::read(&attachment.path)
         .map_err(|e| format!("读取文件失败: {}", e))
+}
+
+/// 创建提醒
+#[tauri::command]
+pub async fn create_reminder(
+    note_id: String,
+    remind_at: DateTime<Utc>,
+    repeat_rule: RepeatRule,
+    notify_system: bool,
+    notify_sound: bool,
+    memo: Option<String>,
+    db: State<'_, Database>,
+) -> Result<Reminder, String> {
+    db.create_reminder(&note_id, remind_at, repeat_rule, notify_system, notify_sound, memo)
+}
+
+/// 获取便签的所有提醒
+#[tauri::command]
+pub async fn get_note_reminders(
+    note_id: String,
+    db: State<'_, Database>,
+) -> Result<Vec<Reminder>, String> {
+    db.get_note_reminders(&note_id)
+}
+
+/// 获取所有活跃提醒
+#[tauri::command]
+pub async fn get_active_reminders(
+    db: State<'_, Database>,
+) -> Result<Vec<Reminder>, String> {
+    db.get_active_reminders()
+}
+
+/// 更新提醒
+#[tauri::command]
+pub async fn update_reminder(
+    id: String,
+    remind_at: DateTime<Utc>,
+    repeat_rule: RepeatRule,
+    notify_system: bool,
+    notify_sound: bool,
+    memo: Option<String>,
+    db: State<'_, Database>,
+) -> Result<(), String> {
+    db.update_reminder(&id, remind_at, repeat_rule, notify_system, notify_sound, memo)
+}
+
+/// 删除提醒
+#[tauri::command]
+pub async fn delete_reminder(
+    id: String,
+    db: State<'_, Database>,
+) -> Result<(), String> {
+    db.delete_reminder(&id)
+}
+
+/// 获取即将到期的提醒
+#[tauri::command]
+pub async fn get_due_reminders(
+    db: State<'_, Database>,
+) -> Result<Vec<Reminder>, String> {
+    db.get_due_reminders()
 }

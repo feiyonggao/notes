@@ -12,6 +12,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             // 当尝试打开第二个实例时，将现有窗口带到前台
             if let Some(window) = app.get_webview_window("main") {
@@ -71,6 +72,12 @@ pub fn run() {
             commands::upload_attachment,
             commands::delete_attachment,
             commands::get_attachment_data,
+            commands::create_reminder,
+            commands::get_note_reminders,
+            commands::get_active_reminders,
+            commands::update_reminder,
+            commands::delete_reminder,
+            commands::get_due_reminders,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { invoke } from '@tauri-apps/api/core';
-import { Note, AppSettings, Stats, Attachment } from '../types/note';
+import { Note, AppSettings, Stats, Attachment, Reminder, RepeatRule } from '../types/note';
 
 interface NoteStore {
   // 状态
@@ -15,6 +15,7 @@ interface NoteStore {
   viewMode: 'grid' | 'list';
   dataDir: string;
   defaultDataDir: string;
+  reminders: Reminder[];
 
   // 操作
   loadNotes: () => Promise<void>;
@@ -40,6 +41,13 @@ interface NoteStore {
   uploadAttachment: (noteId: string, file: File) => Promise<Attachment>;
   deleteAttachment: (id: string) => Promise<void>;
   getAttachmentData: (id: string) => Promise<string>;
+
+  // 提醒操作
+  loadNoteReminders: (noteId: string) => Promise<void>;
+  createReminder: (noteId: string, remindAt: Date, repeatRule: RepeatRule, notifySystem: boolean, notifySound: boolean, memo?: string) => Promise<Reminder>;
+  updateReminder: (id: string, remindAt: Date, repeatRule: RepeatRule, notifySystem: boolean, notifySound: boolean, memo?: string) => Promise<void>;
+  deleteReminder: (id: string) => Promise<void>;
+  loadDueReminders: () => Promise<Reminder[]>;
 }
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
@@ -65,6 +73,7 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
   viewMode: 'grid',
   dataDir: '',
   defaultDataDir: '',
+  reminders: [],
 
   // 加载所有便签
   loadNotes: async () => {
@@ -389,6 +398,95 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
     } catch (error) {
       console.error('获取附件数据失败:', error);
       throw error;
+    }
+  },
+
+  // 加载便签的提醒
+  loadNoteReminders: async (noteId: string) => {
+    try {
+      const reminders = await invoke<Reminder[]>('get_note_reminders', { noteId });
+      set({ reminders });
+    } catch (error) {
+      console.error('加载提醒失败:', error);
+    }
+  },
+
+  // 创建提醒
+  createReminder: async (noteId: string, remindAt: Date, repeatRule: RepeatRule, notifySystem: boolean, notifySound: boolean, memo?: string) => {
+    try {
+      const reminder = await invoke<Reminder>('create_reminder', {
+        noteId,
+        remindAt: remindAt.toISOString(),
+        repeatRule,
+        notifySystem,
+        notifySound,
+        memo: memo || null,
+      });
+
+      // 更新提醒列表
+      set(state => ({
+        reminders: [...state.reminders, reminder],
+      }));
+
+      return reminder;
+    } catch (error) {
+      console.error('创建提醒失败:', error);
+      throw error;
+    }
+  },
+
+  // 更新提醒
+  updateReminder: async (id: string, remindAt: Date, repeatRule: RepeatRule, notifySystem: boolean, notifySound: boolean, memo?: string) => {
+    try {
+      await invoke('update_reminder', {
+        id,
+        remindAt: remindAt.toISOString(),
+        repeatRule,
+        notifySystem,
+        notifySound,
+        memo: memo || null,
+      });
+
+      // 更新提醒列表
+      set(state => ({
+        reminders: state.reminders.map(r => r.id === id ? {
+          ...r,
+          remind_at: remindAt.toISOString(),
+          repeat_rule: repeatRule,
+          notify_system: notifySystem,
+          notify_sound: notifySound,
+          memo: memo || null,
+        } : r),
+      }));
+    } catch (error) {
+      console.error('更新提醒失败:', error);
+      throw error;
+    }
+  },
+
+  // 删除提醒
+  deleteReminder: async (id: string) => {
+    try {
+      await invoke('delete_reminder', { id });
+
+      // 更新提醒列表
+      set(state => ({
+        reminders: state.reminders.filter(r => r.id !== id),
+      }));
+    } catch (error) {
+      console.error('删除提醒失败:', error);
+      throw error;
+    }
+  },
+
+  // 获取到期提醒
+  loadDueReminders: async () => {
+    try {
+      const reminders = await invoke<Reminder[]>('get_due_reminders');
+      return reminders;
+    } catch (error) {
+      console.error('获取到期提醒失败:', error);
+      return [];
     }
   },
 }));

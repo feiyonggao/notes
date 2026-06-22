@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Note, COLOR_MAP, COLORS, NoteColor } from '../../types/note';
 import { useNoteStore } from '../../stores/noteStore';
 import RichEditor from '../RichEditor';
+import ReminderPanel from '../ReminderPanel';
 import './styles.css';
 
 interface DesktopEditorProps {
@@ -27,6 +28,7 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
   const [color, setColor] = useState(note.color);
   const [isSaving, setIsSaving] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showReminder, setShowReminder] = useState(false);
 
   const originalValuesRef = useRef<{ title: string; content: string; color: NoteColor } | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -102,6 +104,7 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
         {/* 右侧：操作 */}
         <div className="topbar-actions">
           {isSaving && <span className="save-dot" />}
+          <button className="topbar-btn reminder-btn" onClick={() => setShowReminder(true)} title="提醒">⏰</button>
           <button className="topbar-btn exit-btn" onClick={onExitDesktop} title="退出桌面模式">✕</button>
           <div className="menu-wrapper" ref={menuRef}>
             <button className="topbar-btn" onClick={() => setShowMenu(!showMenu)}>⋯</button>
@@ -147,6 +150,14 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
           noteId={note.id}
         />
       </div>
+
+      {/* 提醒面板 */}
+      {showReminder && (
+        <ReminderPanel
+          noteId={note.id}
+          onClose={() => setShowReminder(false)}
+        />
+      )}
     </div>
   );
 };

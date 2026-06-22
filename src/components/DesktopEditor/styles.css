@@ -72,6 +72,15 @@
   background: rgba(239, 68, 68, 0.2);
 }
 
+.topbar-btn.reminder-btn {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.topbar-btn.reminder-btn:hover {
+  background: rgba(245, 158, 11, 0.2);
+}
+
 /* 保存指示器 */
 .save-dot {
   width: 6px;

@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNoteStore } from '../../stores/noteStore';
 import { COLORS } from '../../types/note';
+import { save, open } from '@tauri-apps/plugin-dialog';
+import { writeTextFile, readTextFile } from '@tauri-apps/plugin-fs';
 import './styles.css';
 
 const Sidebar: React.FC = () => {
@@ -20,12 +22,16 @@ const Sidebar: React.FC = () => {
     loadNotes,
     loadTags,
     loadStats,
+    exportNotes,
+    importNotes,
   } = useNoteStore();
 
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isTagsExpanded, setIsTagsExpanded] = useState(true);
   const [isPinnedExpanded, setIsPinnedExpanded] = useState(true);
   const [isRecentExpanded, setIsRecentExpanded] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
 
   // 计算每个标签的便签数量
   const tagCounts = useMemo(() => {
@@ -44,6 +50,58 @@ const Sidebar: React.FC = () => {
     await loadTags();
     await loadStats();
   }, [loadNotes, loadTags, loadStats]);
+
+  // 导出便签
+  const handleExport = useCallback(async () => {
+    try {
+      setIsExporting(true);
+      const json = await exportNotes();
+
+      const filePath = await save({
+        defaultPath: 'notes-backup.json',
+        filters: [{
+          name: 'JSON',
+          extensions: ['json']
+        }]
+      });
+
+      if (filePath) {
+        await writeTextFile(filePath, json);
+        alert('导出成功！');
+      }
+    } catch (error) {
+      console.error('导出失败:', error);
+      alert('导出失败：' + error);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [exportNotes]);
+
+  // 导入便签
+  const handleImport = useCallback(async () => {
+    try {
+      setIsImporting(true);
+
+      const filePath = await open({
+        multiple: false,
+        filters: [{
+          name: 'JSON',
+          extensions: ['json']
+        }]
+      });
+
+      if (filePath) {
+        const json = await readTextFile(filePath as string);
+        const count = await importNotes(json);
+        alert(`导入成功！导入了 ${count} 个便签。`);
+      }
+    } catch (error) {
+      console.error('导入失败:', error);
+      alert('导入失败：' + error);
+    } finally {
+      setIsImporting(false);
+    }
+  }, [importNotes]);
 
   // 处理搜索
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -262,6 +320,24 @@ const Sidebar: React.FC = () => {
 
       {/* 底部信息 */}
       <div className="sidebar-footer">
+        <div className="footer-actions">
+          <button
+            className="footer-btn"
+            onClick={handleExport}
+            disabled={isExporting}
+            title="导出所有便签"
+          >
+            {isExporting ? '⏳' : '📤'} 导出
+          </button>
+          <button
+            className="footer-btn"
+            onClick={handleImport}
+            disabled={isImporting}
+            title="导入便签"
+          >
+            {isImporting ? '⏳' : '📥'} 导入
+          </button>
+        </div>
         <div className="footer-info">
           <span>Notes v1.0</span>
           <span>•</span>

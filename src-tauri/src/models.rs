@@ -1,6 +1,37 @@
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 
+/// 重复规则
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum RepeatRule {
+    None,
+    Daily,
+    Weekly,
+    Monthly,
+    Yearly,
+    Custom(String), // cron 表达式
+}
+
+impl Default for RepeatRule {
+    fn default() -> Self {
+        RepeatRule::None
+    }
+}
+
+/// 提醒数据结构
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Reminder {
+    pub id: String,
+    pub note_id: String,
+    pub remind_at: DateTime<Utc>,
+    pub repeat_rule: RepeatRule,
+    pub notify_system: bool,
+    pub notify_sound: bool,
+    pub memo: Option<String>,
+    pub is_active: bool,
+    pub created_at: DateTime<Utc>,
+}
+
 /// 便签颜色主题
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum NoteColor {

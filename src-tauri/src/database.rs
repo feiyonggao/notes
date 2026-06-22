@@ -2,8 +2,9 @@ use std::sync::Mutex;
 use rusqlite::{Connection, params};
 use tauri::AppHandle;
 use tauri::Manager;
+use chrono::{DateTime, Utc};
 
-use crate::models::{Note, NotesStore, AppSettings, NoteColor, Attachment, AttachmentType};
+use crate::models::{Note, NotesStore, AppSettings, NoteColor, Attachment, AttachmentType, Reminder, RepeatRule};
 
 /// SQLite 数据库管理器
 pub struct Database {
@@ -70,6 +71,24 @@ impl Database {
                 key TEXT PRIMARY KEY,
                 value TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS reminders (
+                id TEXT PRIMARY KEY,
+                note_id TEXT NOT NULL,
+                remind_at TEXT NOT NULL,
+                repeat_rule TEXT NOT NULL DEFAULT 'None',
+                repeat_custom TEXT,
+                notify_system INTEGER NOT NULL DEFAULT 1,
+                notify_sound INTEGER NOT NULL DEFAULT 1,
+                memo TEXT,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_reminders_note_id ON reminders(note_id);
+            CREATE INDEX IF NOT EXISTS idx_reminders_remind_at ON reminders(remind_at);
+            CREATE INDEX IF NOT EXISTS idx_reminders_is_active ON reminders(is_active);
         ").map_err(|e| format!("创建表失败: {}", e))?;
 
         Ok(Self {
@@ -882,5 +901,179 @@ impl Database {
         }
 
         Ok(attachments_dir)
+    }
+
+    /// 创建提醒
+    pub fn create_reminder(&self, note_id: &str, remind_at: DateTime<Utc>, repeat_rule: RepeatRule,
+                           notify_system: bool, notify_sound: bool, memo: Option<String>) -> Result<Reminder, String> {
+        let conn = self.conn.lock()
+            .map_err(|e| format!("获取锁失败: {}", e))?;
+
+        let id = uuid::Uuid::new_v4().to_string();
+        let now = Utc::now();
+        let repeat_rule_str = serde_json::to_string(&repeat_rule)
+            .map_err(|e| format!("序列化重复规则失败: {}", e))?;
+
+        conn.execute(
+            "INSERT INTO reminders (id, note_id, remind_at, repeat_rule, notify_system, notify_sound, memo, is_active, created_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 1, ?8)",
+            params![id, note_id, remind_at.to_rfc3339(), repeat_rule_str, notify_system as i32, notify_sound as i32, memo, now.to_rfc3339()],
+        ).map_err(|e| format!("创建提醒失败: {}", e))?;
+
+        Ok(Reminder {
+            id,
+            note_id: note_id.to_string(),
+            remind_at,
+            repeat_rule,
+            notify_system,
+            notify_sound,
+            memo,
+            is_active: true,
+            created_at: now,
+        })
+    }
+
+    /// 获取便签的所有提醒
+    pub fn get_note_reminders(&self, note_id: &str) -> Result<Vec<Reminder>, String> {
+        let conn = self.conn.lock()
+            .map_err(|e| format!("获取锁失败: {}", e))?;
+
+        let mut stmt = conn.prepare(
+            "SELECT id, note_id, remind_at, repeat_rule, notify_system, notify_sound, memo, is_active, created_at
+             FROM reminders WHERE note_id = ?1 ORDER BY remind_at ASC"
+        ).map_err(|e| format!("准备查询失败: {}", e))?;
+
+        let reminders = stmt.query_map(params![note_id], |row| {
+            let repeat_rule_str: String = row.get(3)?;
+            let repeat_rule: RepeatRule = serde_json::from_str(&repeat_rule_str)
+                .unwrap_or(RepeatRule::None);
+
+            Ok(Reminder {
+                id: row.get(0)?,
+                note_id: row.get(1)?,
+                remind_at: chrono::DateTime::parse_from_rfc3339(&row.get::<_, String>(2)?)
+                    .map(|dt| dt.with_timezone(&Utc))
+                    .unwrap_or_else(|_| Utc::now()),
+                repeat_rule,
+                notify_system: row.get::<_, i32>(4)? != 0,
+                notify_sound: row.get::<_, i32>(5)? != 0,
+                memo: row.get(6)?,
+                is_active: row.get::<_, i32>(7)? != 0,
+                created_at: chrono::DateTime::parse_from_rfc3339(&row.get::<_, String>(8)?)
+                    .map(|dt| dt.with_timezone(&Utc))
+                    .unwrap_or_else(|_| Utc::now()),
+            })
+        })
+        .map_err(|e| format!("查询失败: {}", e))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| format!("收集结果失败: {}", e))?;
+
+        Ok(reminders)
+    }
+
+    /// 获取所有活跃提醒
+    pub fn get_active_reminders(&self) -> Result<Vec<Reminder>, String> {
+        let conn = self.conn.lock()
+            .map_err(|e| format!("获取锁失败: {}", e))?;
+
+        let mut stmt = conn.prepare(
+            "SELECT id, note_id, remind_at, repeat_rule, notify_system, notify_sound, memo, is_active, created_at
+             FROM reminders WHERE is_active = 1 ORDER BY remind_at ASC"
+        ).map_err(|e| format!("准备查询失败: {}", e))?;
+
+        let reminders = stmt.query_map([], |row| {
+            let repeat_rule_str: String = row.get(3)?;
+            let repeat_rule: RepeatRule = serde_json::from_str(&repeat_rule_str)
+                .unwrap_or(RepeatRule::None);
+
+            Ok(Reminder {
+                id: row.get(0)?,
+                note_id: row.get(1)?,
+                remind_at: chrono::DateTime::parse_from_rfc3339(&row.get::<_, String>(2)?)
+                    .map(|dt| dt.with_timezone(&Utc))
+                    .unwrap_or_else(|_| Utc::now()),
+                repeat_rule,
+                notify_system: row.get::<_, i32>(4)? != 0,
+                notify_sound: row.get::<_, i32>(5)? != 0,
+                memo: row.get(6)?,
+                is_active: row.get::<_, i32>(7)? != 0,
+                created_at: chrono::DateTime::parse_from_rfc3339(&row.get::<_, String>(8)?)
+                    .map(|dt| dt.with_timezone(&Utc))
+                    .unwrap_or_else(|_| Utc::now()),
+            })
+        })
+        .map_err(|e| format!("查询失败: {}", e))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| format!("收集结果失败: {}", e))?;
+
+        Ok(reminders)
+    }
+
+    /// 更新提醒
+    pub fn update_reminder(&self, id: &str, remind_at: DateTime<Utc>, repeat_rule: RepeatRule,
+                           notify_system: bool, notify_sound: bool, memo: Option<String>) -> Result<(), String> {
+        let conn = self.conn.lock()
+            .map_err(|e| format!("获取锁失败: {}", e))?;
+
+        let repeat_rule_str = serde_json::to_string(&repeat_rule)
+            .map_err(|e| format!("序列化重复规则失败: {}", e))?;
+
+        conn.execute(
+            "UPDATE reminders SET remind_at = ?1, repeat_rule = ?2, notify_system = ?3, notify_sound = ?4, memo = ?5
+             WHERE id = ?6",
+            params![remind_at.to_rfc3339(), repeat_rule_str, notify_system as i32, notify_sound as i32, memo, id],
+        ).map_err(|e| format!("更新提醒失败: {}", e))?;
+
+        Ok(())
+    }
+
+    /// 删除提醒
+    pub fn delete_reminder(&self, id: &str) -> Result<(), String> {
+        let conn = self.conn.lock()
+            .map_err(|e| format!("获取锁失败: {}", e))?;
+
+        conn.execute("DELETE FROM reminders WHERE id = ?1", params![id])
+            .map_err(|e| format!("删除提醒失败: {}", e))?;
+
+        Ok(())
+    }
+
+    /// 获取即将到期的提醒（用于通知）
+    pub fn get_due_reminders(&self) -> Result<Vec<Reminder>, String> {
+        let conn = self.conn.lock()
+            .map_err(|e| format!("获取锁失败: {}", e))?;
+
+        let now = Utc::now();
+        let mut stmt = conn.prepare(
+            "SELECT id, note_id, remind_at, repeat_rule, notify_system, notify_sound, memo, is_active, created_at
+             FROM reminders WHERE is_active = 1 AND remind_at <= ?1 ORDER BY remind_at ASC"
+        ).map_err(|e| format!("准备查询失败: {}", e))?;
+
+        let reminders = stmt.query_map(params![now.to_rfc3339()], |row| {
+            let repeat_rule_str: String = row.get(3)?;
+            let repeat_rule: RepeatRule = serde_json::from_str(&repeat_rule_str)
+                .unwrap_or(RepeatRule::None);
+
+            Ok(Reminder {
+                id: row.get(0)?,
+                note_id: row.get(1)?,
+                remind_at: chrono::DateTime::parse_from_rfc3339(&row.get::<_, String>(2)?)
+                    .map(|dt| dt.with_timezone(&Utc))
+                    .unwrap_or_else(|_| Utc::now()),
+                repeat_rule,
+                notify_system: row.get::<_, i32>(4)? != 0,
+                notify_sound: row.get::<_, i32>(5)? != 0,
+                memo: row.get(6)?,
+                is_active: row.get::<_, i32>(7)? != 0,
+                created_at: chrono::DateTime::parse_from_rfc3339(&row.get::<_, String>(8)?)
+                    .map(|dt| dt.with_timezone(&Utc))
+                    .unwrap_or_else(|_| Utc::now()),
+            })
+        })
+        .map_err(|e| format!("查询失败: {}", e))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| format!("收集结果失败: {}", e))?;
+
+        Ok(reminders)
     }
 }
