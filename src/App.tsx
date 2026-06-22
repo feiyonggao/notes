@@ -253,6 +253,7 @@ function App() {
                     setDesktopSelectedNote(null);
                   }
                 }}
+                onExitDesktop={toggleDesktopMode}
               />
             </div>
           ) : (

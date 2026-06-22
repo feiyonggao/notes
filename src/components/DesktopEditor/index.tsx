@@ -14,10 +14,11 @@ interface DesktopEditorProps {
   canPrev: boolean;
   canNext: boolean;
   onClose: () => void;
+  onExitDesktop: () => void;
 }
 
 const DesktopEditor: React.FC<DesktopEditorProps> = ({
-  note, noteIndex, totalNotes, onNewNote, onPrev, onNext, canPrev, canNext, onClose
+  note, noteIndex, totalNotes, onNewNote, onPrev, onNext, canPrev, canNext, onClose, onExitDesktop
 }) => {
   const { updateNote, deleteNote, togglePin, loadTags, loadStats } = useNoteStore();
 
@@ -93,6 +94,7 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
       <div className="compact-topbar">
         {/* 左侧：导航 */}
         <div className="topbar-nav">
+          <button className="topbar-btn exit-btn" onClick={onExitDesktop} title="退出桌面模式">✕</button>
           <button className="topbar-btn" onClick={onPrev} disabled={!canPrev}>‹</button>
           <span className="topbar-count">{noteIndex + 1}/{totalNotes}</span>
           <button className="topbar-btn" onClick={onNext} disabled={!canNext}>›</button>
@@ -121,6 +123,8 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
                 </div>
                 <div className="menu-divider" />
                 <button className="danger" onClick={() => { handleDelete(); setShowMenu(false); }}>🗑 删除</button>
+                <div className="menu-divider" />
+                <button onClick={() => { setShowMenu(false); onExitDesktop(); }}>🖥 退出桌面模式</button>
               </div>
             )}
           </div>
