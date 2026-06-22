@@ -367,7 +367,7 @@
 }
 
 .notes-container.with-editor {
-  flex: 0 0 400px;
+  flex: 0 0 320px;
   border-right: 1px solid var(--border-color);
 }
 
