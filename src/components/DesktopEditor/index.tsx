@@ -123,8 +123,6 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
                 </div>
                 <div className="menu-divider" />
                 <button className="danger" onClick={() => { handleDelete(); setShowMenu(false); }}>🗑 删除</button>
-                <div className="menu-divider" />
-                <button onClick={() => { setShowMenu(false); onExitDesktop(); }}>🖥 退出桌面模式</button>
               </div>
             )}
           </div>
