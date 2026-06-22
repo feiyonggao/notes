@@ -237,6 +237,13 @@ const RichEditor: React.FC<RichEditorProps> = ({
         setIsUploading(false);
         setUploadProgress(0);
       }
+    } else if (!isMarkdown) {
+      // 粘贴纯文本时，自动转换 URL 为超链接
+      e.preventDefault();
+      const text = e.clipboardData.getData('text/plain');
+      const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
+      const html = text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+      document.execCommand('insertHTML', false, html);
     }
   }, [isMarkdown]);
 
@@ -347,6 +354,68 @@ const RichEditor: React.FC<RichEditorProps> = ({
     handleInput();
   }, [handleInput]);
 
+  // 自动将输入的 URL 转换为超链接
+  const autoLinkifyOnInput = useCallback(() => {
+    if (!editorRef.current || isMarkdown) return;
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    const node = range.startContainer;
+
+    // 只处理文本节点
+    if (node.nodeType !== Node.TEXT_NODE) return;
+
+    const text = node.textContent || '';
+    const cursorPos = range.startOffset;
+
+    // 检测是否有完整的 URL（以空格或行尾结束）
+    const urlRegex = /(https?:\/\/[^\s<>"']+)$/;
+    const match = text.substring(0, cursorPos).match(urlRegex);
+
+    if (match) {
+      const url = match[1];
+      const urlStart = text.indexOf(url);
+      const urlEnd = urlStart + url.length;
+
+      // 检查后面是否是空格或已到末尾
+      const afterUrl = text.substring(urlEnd);
+      if (afterUrl === '' || afterUrl.startsWith(' ') || afterUrl.startsWith('\n')) {
+        // 创建链接元素
+        const a = document.createElement('a');
+        a.href = url;
+        a.textContent = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.style.color = '#3b82f6';
+        a.style.textDecoration = 'underline';
+
+        // 分割文本节点
+        const beforeText = text.substring(0, urlStart);
+        const afterText = text.substring(urlEnd);
+
+        const parent = node.parentNode;
+        if (parent) {
+          const beforeNode = document.createTextNode(beforeText);
+          const afterNode = document.createTextNode(afterText);
+
+          parent.insertBefore(beforeNode, node);
+          parent.insertBefore(a, node);
+          parent.insertBefore(afterNode, node);
+          parent.removeChild(node);
+
+          // 设置光标位置到 URL 后面
+          const newRange = document.createRange();
+          newRange.setStart(afterNode, 0);
+          newRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        }
+      }
+    }
+  }, [isMarkdown]);
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -379,7 +448,13 @@ const RichEditor: React.FC<RichEditorProps> = ({
         handleShowFormatMenu();
       }
     }
-  }, [isMarkdown, execFormatCommand, handleShowFormatMenu, onChange]);
+
+    // 在普通模式下，按空格或回车时检测 URL
+    if (!isMarkdown && (e.key === ' ' || e.key === 'Enter')) {
+      // 延迟执行，确保字符已输入
+      setTimeout(() => autoLinkifyOnInput(), 10);
+    }
+  }, [isMarkdown, execFormatCommand, handleShowFormatMenu, onChange, autoLinkifyOnInput]);
 
   return (
     <div className={`rich-editor-container ${isMarkdown ? 'markdown-mode' : ''}`}>
