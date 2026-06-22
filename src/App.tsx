@@ -152,8 +152,9 @@ function App() {
       if (newMode) {
         // 进入桌面模式 - 更小更精简
         await appWindow.setSkipTaskbar(true);
-        await appWindow.setAlwaysOnTop(true);
+        await appWindow.setAlwaysOnTop(false);
         await appWindow.setResizable(true);
+        await appWindow.setMinSize(new LogicalSize(300, 400));
         await appWindow.setSize(new LogicalSize(380, 500));
         try {
           const monitor = await currentMonitor();
