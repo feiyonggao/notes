@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../Modal';
 import { openUrl } from '@tauri-apps/plugin-opener';
+import { checkForUpdates, UpdateInfo } from '../../utils/updater';
 import './styles.css';
 
 interface AboutProps {
@@ -8,7 +9,30 @@ interface AboutProps {
   onClose: () => void;
 }
 
+const CURRENT_VERSION = '1.2.0';
+
 const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+  const [isChecking, setIsChecking] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      checkUpdate();
+    }
+  }, [isOpen]);
+
+  const checkUpdate = async () => {
+    setIsChecking(true);
+    try {
+      const info = await checkForUpdates(CURRENT_VERSION);
+      setUpdateInfo(info);
+    } catch (error) {
+      console.error('检查更新失败:', error);
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="关于" width="450px">
       <div className="about-content">
@@ -16,8 +40,30 @@ const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
         <div className="about-logo">
           <span className="logo-icon">📝</span>
           <h2 className="logo-title">Notes</h2>
-          <p className="logo-version">版本 1.0.0</p>
+          <p className="logo-version">版本 {CURRENT_VERSION}</p>
         </div>
+
+        {/* 版本更新提示 */}
+        {updateInfo?.hasUpdate && (
+          <div className="update-banner">
+            <div className="update-icon">🆕</div>
+            <div className="update-info">
+              <p className="update-text">发现新版本 {updateInfo.latestVersion}</p>
+              <button
+                className="update-btn"
+                onClick={() => openUrl(updateInfo.downloadUrl)}
+              >
+                前往下载
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isChecking && (
+          <div className="update-checking">
+            <span className="checking-spinner">⏳</span> 检查更新中...
+          </div>
+        )}
 
         {/* 描述 */}
         <div className="about-description">

@@ -32,6 +32,65 @@
   color: var(--text-secondary);
 }
 
+/* 版本更新提示 */
+.update-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.1));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-lg);
+}
+
+.update-icon {
+  font-size: 2rem;
+}
+
+.update-info {
+  flex: 1;
+}
+
+.update-text {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.update-btn {
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.update-btn:hover {
+  background: var(--primary-hover);
+}
+
+.update-checking {
+  text-align: center;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.checking-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* 描述 */
 .about-description {
   text-align: center;
