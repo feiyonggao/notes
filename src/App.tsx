@@ -287,7 +287,8 @@ function App() {
           ) : (
             <div className="compact-empty">
               <span>📝</span>
-              <p>按 + 新建便签</p>
+              <p>没有便签</p>
+              <button className="btn-create-note" onClick={handleNewNote}>+ 新建便签</button>
             </div>
           )}
         </div>

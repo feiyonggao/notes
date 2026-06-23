@@ -104,13 +104,13 @@ const DesktopEditor: React.FC<DesktopEditorProps> = ({
         {/* 右侧：操作 */}
         <div className="topbar-actions">
           {isSaving && <span className="save-dot" />}
+          <button className="topbar-btn" onClick={onNewNote} title="新建便签">➕</button>
           <button className="topbar-btn reminder-btn" onClick={() => setShowReminder(true)} title="提醒">⏰</button>
           <button className="topbar-btn exit-btn" onClick={onExitDesktop} title="退出桌面模式">✕</button>
           <div className="menu-wrapper" ref={menuRef}>
             <button className="topbar-btn" onClick={() => setShowMenu(!showMenu)}>⋯</button>
             {showMenu && (
               <div className="dropdown-menu">
-                <button onClick={() => { onNewNote(); setShowMenu(false); }}>📝 新建便签</button>
                 <button onClick={() => { togglePin(note.id); setShowMenu(false); }}>
                   {note.is_pinned ? '📌 取消置顶' : '📌 置顶'}
                 </button>

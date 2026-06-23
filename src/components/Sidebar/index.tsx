@@ -545,7 +545,7 @@ const Sidebar: React.FC = () => {
           </button>
         </div>
         <div className="footer-info">
-          <span>Notes v1.2.0</span>
+          <span>Notes v1.3.0</span>
           <span>•</span>
           <span>{notes.length} 个便签</span>
         </div>

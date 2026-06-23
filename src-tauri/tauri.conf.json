@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Notes",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "identifier": "com.notes.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Notes",
+        "title": "Notes 一个好用的便签工具",
         "width": 1200,
         "height": 800,
         "minWidth": 800,
