@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../Modal';
 import { openUrl } from '@tauri-apps/plugin-opener';
-import { checkForUpdates, UpdateInfo } from '../../utils/updater';
+import { check, Update } from '@tauri-apps/plugin-updater';
 import './styles.css';
 
 interface AboutProps {
@@ -12,8 +12,11 @@ interface AboutProps {
 const CURRENT_VERSION = '1.3.0';
 
 const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
-  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+  const [updateInfo, setUpdateInfo] = useState<Update | null>(null);
   const [isChecking, setIsChecking] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [updateStatus, setUpdateStatus] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
@@ -23,13 +26,60 @@ const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
 
   const checkUpdate = async () => {
     setIsChecking(true);
+    setUpdateStatus('');
     try {
-      const info = await checkForUpdates(CURRENT_VERSION);
-      setUpdateInfo(info);
+      const update = await check();
+      if (update) {
+        setUpdateInfo(update);
+        setUpdateStatus(`发现新版本 ${update.version}`);
+      } else {
+        setUpdateInfo(null);
+        setUpdateStatus('已是最新版本');
+      }
     } catch (error) {
       console.error('检查更新失败:', error);
+      setUpdateStatus('检查更新失败');
     } finally {
       setIsChecking(false);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!updateInfo) return;
+
+    setIsDownloading(true);
+    setDownloadProgress(0);
+    setUpdateStatus('正在下载...');
+
+    try {
+      await updateInfo.downloadAndInstall((event) => {
+        switch (event.event) {
+          case 'Started':
+            setUpdateStatus('开始下载...');
+            break;
+          case 'Progress':
+            const percent = event.data.contentLength
+              ? Math.round((event.data.chunkLength / event.data.contentLength) * 100)
+              : 0;
+            setDownloadProgress(percent);
+            setUpdateStatus(`下载中... ${percent}%`);
+            break;
+          case 'Finished':
+            setUpdateStatus('下载完成，准备安装...');
+            break;
+        }
+      });
+
+      setUpdateStatus('安装完成，即将重启...');
+      // 重启应用
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } catch (error) {
+      console.error('更新失败:', error);
+      setUpdateStatus('更新失败，请手动下载');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -44,18 +94,40 @@ const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* 版本更新提示 */}
-        {updateInfo?.hasUpdate && (
+        {updateInfo && (
           <div className="update-banner">
             <div className="update-icon">🆕</div>
             <div className="update-info">
-              <p className="update-text">发现新版本 {updateInfo.latestVersion}</p>
-              <button
-                className="update-btn"
-                onClick={() => openUrl(updateInfo.downloadUrl)}
-              >
-                前往下载
-              </button>
+              <p className="update-text">发现新版本 {updateInfo.version}</p>
+              <p className="update-date">
+                发布时间: {updateInfo.date ? new Date(updateInfo.date).toLocaleDateString('zh-CN') : '未知'}
+              </p>
+              {isDownloading ? (
+                <div className="update-progress">
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${downloadProgress}%` }}
+                    />
+                  </div>
+                  <span className="progress-text">{downloadProgress}%</span>
+                </div>
+              ) : (
+                <button
+                  className="update-btn"
+                  onClick={handleUpdate}
+                  disabled={isDownloading}
+                >
+                  立即更新
+                </button>
+              )}
             </div>
+          </div>
+        )}
+
+        {updateStatus && !updateInfo && (
+          <div className={`update-status ${updateStatus.includes('失败') ? 'error' : 'success'}`}>
+            {updateStatus}
           </div>
         )}
 
@@ -63,6 +135,13 @@ const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
           <div className="update-checking">
             <span className="checking-spinner">⏳</span> 检查更新中...
           </div>
+        )}
+
+        {/* 手动检查按钮 */}
+        {!isChecking && !updateInfo && (
+          <button className="check-update-btn" onClick={checkUpdate}>
+            检查更新
+          </button>
         )}
 
         {/* 描述 */}

@@ -24,6 +24,7 @@ pub fn run() {
             }
         }))
         .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec![])))
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             // 初始化数据库
             let db = Database::new(&app.handle())?;

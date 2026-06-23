@@ -61,6 +61,8 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Notes ${{ github.ref_name }}'
@@ -69,7 +71,7 @@ jobs:
           prerelease: false
           args: --target ${{ matrix.target }}
 
-  create-release:
+  updater:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
@@ -81,21 +83,67 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Create Release
+      - name: Get release info
+        id: release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: release } = await github.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            return release;
+
+      - name: Generate latest.json
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          PUB_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          # Download signatures from release assets
+          get_signature() {
+            local asset_name=$1
+            local sig_url="https://github.com/feiyonggao/notes/releases/download/v${VERSION}/${asset_name}.sig"
+            curl -sL "$sig_url" 2>/dev/null || echo ""
+          }
+
+          # Get signatures
+          WINDOWS_SIG=$(get_signature "Notes_${VERSION}_x64-setup.nsis.zip")
+          MACOS_ARM64_SIG=$(get_signature "Notes_${VERSION}_aarch64.app.tar.gz")
+          MACOS_X64_SIG=$(get_signature "Notes_${VERSION}_x64.app.tar.gz")
+          LINUX_SIG=$(get_signature "Notes_${VERSION}_amd64.AppImage.tar.gz")
+
+          cat > latest.json << EOF
+          {
+            "version": "${VERSION}",
+            "notes": "Notes v${VERSION} 更新",
+            "pub_date": "${PUB_DATE}",
+            "platforms": {
+              "windows-x86_64": {
+                "signature": "${WINDOWS_SIG}",
+                "url": "https://github.com/feiyonggao/notes/releases/download/v${VERSION}/Notes_${VERSION}_x64-setup.nsis.zip"
+              },
+              "darwin-x86_64": {
+                "signature": "${MACOS_X64_SIG}",
+                "url": "https://github.com/feiyonggao/notes/releases/download/v${VERSION}/Notes_${VERSION}_x64.app.tar.gz"
+              },
+              "darwin-aarch64": {
+                "signature": "${MACOS_ARM64_SIG}",
+                "url": "https://github.com/feiyonggao/notes/releases/download/v${VERSION}/Notes_${VERSION}_aarch64.app.tar.gz"
+              },
+              "linux-x86_64": {
+                "signature": "${LINUX_SIG}",
+                "url": "https://github.com/feiyonggao/notes/releases/download/v${VERSION}/Notes_${VERSION}_amd64.AppImage.tar.gz"
+              }
+            }
+          }
+          EOF
+
+          cat latest.json
+
+      - name: Upload latest.json to release
         uses: softprops/action-gh-release@v2
         with:
-          name: Notes v${{ steps.version.outputs.VERSION }}
-          body: |
-            ## Notes v${{ steps.version.outputs.VERSION }}
-
-            ### 下载说明
-            - **Windows**: 下载 `.msi` 或 `-setup.exe` 安装包
-            - **macOS**: 下载 `.dmg` 文件（ARM64 为 Apple Silicon，x64 为 Intel）
-            - **Linux**: 下载 `.deb` 或 `.AppImage` 文件
-
-            ### 更新内容
-            请查看 [CHANGELOG](https://github.com/feiyonggao/notes/blob/main/CHANGELOG.md) 了解详细更新内容。
-          draft: false
-          prerelease: false
+          files: latest.json
+          tag_name: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
