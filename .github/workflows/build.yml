@@ -66,7 +66,13 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Notes ${{ github.ref_name }}'
-          releaseBody: 'See the assets below to download and install.'
+          releaseBody: |
+            ## Notes ${{ github.ref_name }}
+
+            ### 下载说明
+            - **Windows**: 下载 `.msi` 或 `-setup.exe` 安装包
+            - **macOS**: 下载 `.dmg` 文件（ARM64 为 Apple Silicon，x64 为 Intel）
+            - **Linux**: 下载 `.deb` 或 `.AppImage` 文件
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}
@@ -74,7 +80,7 @@ jobs:
   updater:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/') && secrets.TAURI_SIGNING_PRIVATE_KEY != ''
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -83,27 +89,22 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Get release info
-        id: release
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { data: release } = await github.rest.repos.getLatestRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-            return release;
-
       - name: Generate latest.json
         run: |
           VERSION="${{ steps.version.outputs.VERSION }}"
           PUB_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-          # Download signatures from release assets
+          # Try to download signatures from release assets
           get_signature() {
             local asset_name=$1
             local sig_url="https://github.com/feiyonggao/notes/releases/download/v${VERSION}/${asset_name}.sig"
-            curl -sL "$sig_url" 2>/dev/null || echo ""
+            local sig=$(curl -sL -w "%{http_code}" "$sig_url" 2>/dev/null)
+            local http_code="${sig: -3}"
+            if [ "$http_code" = "200" ]; then
+              echo "${sig%???}"
+            else
+              echo ""
+            fi
           }
 
           # Get signatures
@@ -138,6 +139,7 @@ jobs:
           }
           EOF
 
+          echo "Generated latest.json:"
           cat latest.json
 
       - name: Upload latest.json to release
