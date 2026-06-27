@@ -37,9 +37,10 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": [],
+    "resources": []
+  },
+  "plugins": {
     "updater": {
-      "active": true,
       "endpoints": [
         "https://github.com/feiyonggao/notes/releases/latest/download/latest.json"
       ],
