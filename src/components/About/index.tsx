@@ -51,15 +51,20 @@ const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
     setDownloadProgress(0);
     setUpdateStatus('正在下载...');
 
+    let contentLength = 0;
+    let downloaded = 0;
+
     try {
       await updateInfo.downloadAndInstall((event) => {
         switch (event.event) {
           case 'Started':
+            contentLength = event.data.contentLength ?? 0;
             setUpdateStatus('开始下载...');
             break;
           case 'Progress':
-            const percent = event.data.contentLength
-              ? Math.round((event.data.chunkLength / event.data.contentLength) * 100)
+            downloaded += event.data.chunkLength;
+            const percent = contentLength > 0
+              ? Math.round((downloaded / contentLength) * 100)
               : 0;
             setDownloadProgress(percent);
             setUpdateStatus(`下载中... ${percent}%`);
