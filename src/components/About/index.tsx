@@ -9,7 +9,7 @@ interface AboutProps {
   onClose: () => void;
 }
 
-const CURRENT_VERSION = '1.3.1';
+const CURRENT_VERSION = '1.3.2';
 
 const About: React.FC<AboutProps> = ({ isOpen, onClose }) => {
   const [updateInfo, setUpdateInfo] = useState<Update | null>(null);
